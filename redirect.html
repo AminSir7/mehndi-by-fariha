@@ -1,228 +1,215 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Confirmation - Mehndi By Fariha</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #8a64d6;
-            --primary-dark: #6c47b5;
-            --bg-lavender: #f3effe;
-            --card-bg: #ffffff;
-            --text-color: #4a3e56;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>অর্ডার নিশ্চিতকরণ - Mehndi By Fariha</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Hind Siliguri', sans-serif;
+      background: linear-gradient(135deg, #f5efff 0%, #e6d5ff 50%, #f9f5ff 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-lavender);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            color: var(--text-color);
-        }
+    /* Glassmorphism Card */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 20px 40px rgba(123, 75, 184, 0.12);
+    }
 
-        .card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 30px 25px;
-            max-width: 420px;
-            width: 100%;
-            box-shadow: 0 10px 30px rgba(138, 100, 214, 0.15);
-            text-align: center;
-            border: 1px solid #e2d7f8;
-        }
+    /* Pulse Glow Icon */
+    .success-icon-wrap {
+      background: linear-gradient(135deg, #9b6bcb 0%, #7b4bb8 100%);
+      box-shadow: 0 10px 25px rgba(123, 75, 184, 0.35);
+      animation: pulseGlow 2s infinite alternate;
+    }
 
-        .success-icon {
-            width: 70px;
-            height: 70px;
-            background: #e8dbfc;
-            color: var(--primary);
-            font-size: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 15px;
-        }
+    @keyframes pulseGlow {
+      0% { transform: scale(1); box-shadow: 0 10px 25px rgba(123, 75, 184, 0.35); }
+      100% { transform: scale(1.06); box-shadow: 0 15px 35px rgba(123, 75, 184, 0.5); }
+    }
 
-        h2 { color: var(--primary-dark); margin-bottom: 8px; font-size: 22px; }
-        p.sub { font-size: 14px; color: #7a6b8a; margin-bottom: 20px; }
+    /* Animated Button */
+    .btn-action {
+      background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+      box-shadow: 0 8px 20px rgba(109, 40, 217, 0.3);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
 
-        .order-summary {
-            background: #faf8ff;
-            border: 1px dashed #cbb8f0;
-            border-radius: 12px;
-            padding: 15px;
-            text-align: left;
-            margin-bottom: 25px;
-            font-size: 14px;
-        }
+    .btn-action:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px rgba(109, 40, 217, 0.45);
+      background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+    }
 
-        .order-summary div { margin-bottom: 8px; }
-        .order-summary div:last-child { margin-bottom: 0; }
+    .btn-action:active:not(:disabled) {
+      transform: translateY(1px);
+    }
 
-        .btn-send {
-            background: linear-gradient(135deg, #9b72cf, #7b52ab);
-            color: #fff;
-            border: none;
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(138, 100, 214, 0.3);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
+    /* Ripple Effect */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.4);
+      transform: scale(0);
+      animation: ripple-anim 0.6s linear;
+      pointer-events: none;
+    }
 
-        .btn-send:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(138, 100, 214, 0.4); }
+    @keyframes ripple-anim {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
 
-        .anim-container { display: none; margin-top: 20px; }
+    /* Spinner */
+    .spinner {
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 3px solid #ffffff;
+      width: 20px;
+      height: 20px;
+      animation: spin 0.8s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
 
-        .icon-anim-box {
-            position: relative;
-            height: 60px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 25px;
-            margin-bottom: 15px;
-        }
-
-        .msg-icon {
-            font-size: 28px;
-            color: var(--primary);
-            animation: bounce 1.2s infinite alternate ease-in-out;
-        }
-
-        .msg-icon.plane { animation: fly 1.5s infinite linear; }
-
-        @keyframes bounce { 0% { transform: translateY(0); } 100% { transform: translateY(-12px); color: #6c47b5; } }
-        @keyframes fly { 0% { transform: translate(-10px, 10px); opacity: 0.3; } 50% { opacity: 1; } 100% { transform: translate(15px, -15px); opacity: 0; } }
-
-        .progress-box {
-            background: #e9e1f7;
-            border-radius: 20px;
-            height: 18px;
-            width: 100%;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            background: linear-gradient(90deg, #8a64d6, #5c35a6);
-            height: 100%;
-            width: 0%;
-            transition: width 0.1s ease;
-            border-radius: 20px;
-        }
-
-        .progress-text { font-size: 13px; font-weight: bold; color: var(--primary-dark); margin-top: 8px; }
-        .sent-success-msg { display: none; color: #2e7d32; font-weight: 600; margin-top: 15px; font-size: 15px; }
-    </style>
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
 </head>
-<body>
+<body class="p-4">
 
-<div class="card">
-    <div class="success-icon"><i class="fa-solid fa-check"></i></div>
-    <h2>অর্ডার সফল হয়েছে!</h2>
-    <p class="sub">আপনার অর্ডারটি নিশ্চিত করতে নিচের বাটনে ক্লিক করুন</p>
+  <div class="glass-card rounded-3xl p-8 max-w-md w-full text-center relative z-10 transition-all duration-500">
+    
+    <!-- Success Animated Badge -->
+    <div class="flex justify-center mb-6">
+      <div class="success-icon-wrap w-20 h-20 rounded-full flex items-center justify-center text-white">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"></path>
+        </svg>
+      </div>
+    </div>
 
-    <div class="order-summary" id="summaryBox"></div>
+    <h2 class="text-2xl font-bold text-gray-800 mb-2">অর্ডার সফল হয়েছে!</h2>
+    <p class="text-gray-600 text-base mb-8">আপনার অর্ডারটি চূড়ান্তভাবে কনফার্ম করতে নিচের বাটনে ক্লিক করুন</p>
 
-    <button id="sendAdminBtn" class="btn-send" onclick="startSendingProcess()">
-        <i class="fa-paper-plane fa-regular"></i> আপনার অর্ডারটি এডমিনের কাছে পাঠান
+    <!-- Action Button -->
+    <button id="sendAdminBtn" onclick="handleClick(event)" class="btn-action w-full text-white font-semibold py-4 px-6 rounded-2xl flex items-center justify-center space-x-2 text-lg">
+      <svg id="btnIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+      </svg>
+      <span id="btnText">আপনার অর্ডারটি এডমিনের কাছে পাঠান</span>
     </button>
+  </div>
 
-    <div class="anim-container" id="animBox">
-        <div class="icon-anim-box">
-            <i class="fa-solid fa-envelope-open-text msg-icon"></i>
-            <i class="fa-solid fa-paper-plane msg-icon plane"></i>
-        </div>
-        <div class="progress-box">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
-        <div class="progress-text" id="progressText">0%</div>
-    </div>
+  <script>
+    function handleClick(e) {
+      const btn = e.currentTarget;
 
-    <div class="sent-success-msg" id="sentMsg">
-        <i class="fa-solid fa-circle-check"></i> এডমিনের কাছে সফলভাবে অর্ডারটি পাঠানো হয়েছে!
-    </div>
-</div>
+      // Ripple Effect Creation
+      const circle = document.createElement("span");
+      const diameter = Math.max(btn.clientWidth, btn.clientHeight);
+      const radius = diameter / 2;
+      circle.style.width = circle.style.height = `${diameter}px`;
+      circle.style.left = `${e.clientX - btn.getBoundingClientRect().left - radius}px`;
+      circle.style.top = `${e.clientY - btn.getBoundingClientRect().top - radius}px`;
+      circle.classList.add("ripple");
+      
+      const existingRipple = btn.getElementsByClassName("ripple")[0];
+      if (existingRipple) existingRipple.remove();
+      btn.appendChild(circle);
 
-<script>
-  function startSendingProcess() {
-    const btn = document.getElementById('sendAdminBtn');
-    if (!btn) return;
+      // Trigger standard API logic
+      startSendingProcess();
+    }
 
-    btn.innerText = "পাঠানো হচ্ছে...";
-    btn.disabled = true;
-    if (btn.classList) btn.classList.add('sending-loader');
+    function startSendingProcess() {
+      const btn = document.getElementById('sendAdminBtn');
+      const btnText = document.getElementById('btnText');
+      const btnIcon = document.getElementById('btnIcon');
+      if (!btn) return;
 
-    // ১. LocalStorage থেকে সম্পূর্ণ অর্ডারের তথ্য নেওয়া
-    let pendingOrder = null;
-    try {
-      const rawData = localStorage.getItem('pendingOrderData');
-      if (rawData) pendingOrder = JSON.parse(rawData);
-    } catch (e) {}
+      btnIcon.style.display = 'none';
+      btnText.innerHTML = '<span class="spinner"></span> পাঠানো হচ্ছে...';
+      btn.disabled = true;
 
-    // ২. Zinipay URL Parameters থেকে ব্যাকআপ ডাটা নেওয়া
-    const urlParams = new URLSearchParams(window.location.search);
-    const cusName = urlParams.get('cus_name') || (pendingOrder && pendingOrder.customer ? pendingOrder.customer.name : '');
-    const paidAmount = urlParams.get('amount') || (pendingOrder ? pendingOrder.payAmount : '');
-    const trxId = urlParams.get('transaction_id') || '';
+      let pendingOrder = null;
+      try {
+        const rawData = localStorage.getItem('pendingOrderData');
+        if (rawData) pendingOrder = JSON.parse(rawData);
+      } catch (e) {}
 
-    // কাস্টমার অবজেক্ট তৈরি
-    const customerData = (pendingOrder && pendingOrder.customer) ? pendingOrder.customer : {
-      name: cusName || "Customer",
-      mobile: urlParams.get('cus_phone') || "N/A",
-      district: urlParams.get('district') || "N/A",
-      address: urlParams.get('address') || "N/A"
-    };
+      const urlParams = new URLSearchParams(window.location.search);
 
-    const payloadData = {
-      action: "SEND_TELEGRAM",
-      customer: customerData,
-      cartItems: pendingOrder ? pendingOrder.cartItems : [],
-      productTotal: pendingOrder ? pendingOrder.productTotal : 0,
-      deliveryCharge: pendingOrder ? pendingOrder.deliveryCharge : 0,
-      totalAmount: pendingOrder ? pendingOrder.totalAmount : paidAmount,
-      payAmount: paidAmount || (pendingOrder ? pendingOrder.payAmount : 0),
-      trxId: trxId
-    };
+      const customerData = {
+        name: (pendingOrder && pendingOrder.customer && pendingOrder.customer.name) 
+          ? pendingOrder.customer.name 
+          : (urlParams.get('cus_name') || 'Customer'),
+        mobile: (pendingOrder && pendingOrder.customer && pendingOrder.customer.mobile) 
+          ? pendingOrder.customer.mobile 
+          : (urlParams.get('cus_phone') || "N/A"),
+        district: (pendingOrder && pendingOrder.customer && pendingOrder.customer.district) 
+          ? pendingOrder.customer.district 
+          : (urlParams.get('district') || "N/A"),
+        address: (pendingOrder && pendingOrder.customer && pendingOrder.customer.address) 
+          ? pendingOrder.customer.address 
+          : (urlParams.get('address') || "N/A")
+      };
 
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbzx2vTmjA76dHDS2EDaeafutCcs0JWx1DILf4uvzbjVM4-tlKm5jJA27Wylno9OmJeorA/exec";
+      const payloadData = {
+        action: "SEND_TELEGRAM",
+        customer: customerData,
+        cartItems: pendingOrder ? pendingOrder.cartItems : [],
+        productTotal: pendingOrder ? pendingOrder.productTotal : 0,
+        deliveryCharge: pendingOrder ? pendingOrder.deliveryCharge : 0,
+        totalAmount: pendingOrder ? pendingOrder.totalAmount : (urlParams.get('amount') || 0),
+        payAmount: pendingOrder ? pendingOrder.payAmount : (urlParams.get('amount') || 0)
+      };
 
-    fetch(scriptUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8"
-      },
-      body: JSON.stringify(payloadData)
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (btn.classList) btn.classList.remove('sending-loader');
-      btn.innerText = "✓ এডমিনের কাছে সফলভাবে পাঠানো হয়েছে";
-      btn.style.backgroundColor = "#28a745";
-    })
-    .catch(err => {
-      console.error(err);
-      if (btn.classList) btn.classList.remove('sending-loader');
-      alert("পাঠাতে সমস্যা হয়েছে, আবার চেষ্টা করুন।");
-      btn.innerText = "আপনার অর্ডারটি এডমিনের কাছে পাঠান";
-      btn.disabled = false;
-    });
-  }
-</script>
+      fetch("https://script.google.com/macros/s/AKfycbzx2vTmjA76dHDS2EDaeafutCcs0JWx1DlLF4uvzbjVM4-t1Km5jJA27Wylno90mJeorA/exec", {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payloadData)
+      })
+      .then(res => res.json())
+      .then(data => {
+        // Confetti Burst Effect
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#8b5cf6', '#a78bfa', '#c4b5fd', '#10b981']
+        });
 
+        btnText.innerText = "✓ এডমিনের কাছে সফলভাবে পাঠানো হয়েছে";
+        btn.style.background = "linear-gradient(135deg, #10b981 0%, #059669 100%)";
+        btn.style.boxShadow = "0 8px 20px rgba(16, 185, 129, 0.35)";
+      })
+      .catch(err => {
+        alert("পাঠাতে সমস্যা হয়েছে, আবার চেষ্টা করুন।");
+        btnIcon.style.display = 'inline-block';
+        btnText.innerText = "আপনার অর্ডারটি এডমিনের কাছে পাঠান";
+        btn.disabled = false;
+      });
+    }
+  </script>
 </body>
 </html>
