@@ -408,72 +408,66 @@
         document.getElementById('btnTotalPrice').textContent = `৳ ${total}`;
     }
 
-    // অর্ডার সাবমিট এবং Telegram API-তে পাঠানো
-    document.getElementById('orderForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const submitBtn = document.getElementById('submitBtn');
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'পেমেন্ট পেজে নেওয়া হচ্ছে...';
+    // অর্ডার সাবমিট এবং ZiniPay পেমেন্ট পেজে রিডাইরেক্ট
+document.getElementById('orderForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
 
-    const baseUrl = window.location.origin;
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'পেমেন্ট পেজে নেওয়া হচ্ছে...';
 
-    const selectedPaymentOption = "ADVANCE_DELIVERY";
+  const orderData = {
+    product: selectedProduct ? selectedProduct.name : "",
+    price: selectedProduct ? selectedProduct.price : 0,
+    deliveryCharge: selectedDeliveryCharge,
+    total: (selectedProduct ? selectedProduct.price : 0) + selectedDeliveryCharge,
+    paymentOption: "ADVANCE_DELIVERY",
+    customer: {
+      name: document.getElementById('fullName').value,
+      mobile: document.getElementById('mobileNumber').value,
+      district: document.getElementById('districtSelect').value,
+      address: document.getElementById('fullAddress').value
+    },
+    redirect_url: 'https://aminsir7.github.io/mehndi-by-fariha/redirect.html',
+    cancel_url: 'https://aminsir7.github.io/mehndi-by-fariha/cancel.html'
+  };
 
-      const orderData = {
-        product: selectedProduct.name,
-        price: selectedProduct.price,
-        deliveryCharge: selectedDeliveryCharge,
-        total: selectedProduct.price + selectedDeliveryCharge,
-        paymentOption: selectedPaymentOption,
-        customer: {
-          name: document.getElementById('fullName').value,
-          mobile: document.getElementById('mobileNumber').value,
-          district: document.getElementById('districtSelect').value,
-          address: document.getElementById('fullAddress').value
-        },
-        redirect_url: 'https://aminsir7.github.io/mehndi-by-fariha/redirect.html',
-        cancel_url: 'https://aminsir7.github.io/mehndi-by-fariha/cancel.html'
-      };
+  try {
+    const payload = {
+      ...orderData,
+      payAmount: selectedDeliveryCharge,
+      action: "CREATE_PAYMENT"
+    };
 
-      try {
-          // ১ম অপশন (এডভান্স ডেলিভারি চার্জ): ZiniPay পেমেন্ট পেজে যাবে
-          const payload = {
-            ...orderData,
-            payAmount: selectedDeliveryCharge,
-            action: "CREATE_PAYMENT"
-          };
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
 
-          const res = await fetch(APPS_SCRIPT_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify(payload)
-          });
+    const rawText = await res.text();
+    let result;
+    try {
+      result = JSON.parse(rawText);
+    } catch (e) {
+      console.error("Raw response failed to parse:", rawText);
+      throw new Error("Invalid response format from server");
+    }
 
-          const rawText = await res.text();
-          let result;
-          try {
-            result = JSON.parse(rawText);
-          } catch (e) {
-            console.error("Raw response failed to parse:", rawText);
-            throw new Error("Invalid response format from server");
-          }
-
-          if (result && (result.status === true || result.status === "success") && result.payment_url) {
-            localStorage.setItem('lastOrder', JSON.stringify(orderData));
-            window.location.href = result.payment_url;
-          } else {
-            alert('পেমেন্ট শুরু করতে সমস্যা হয়েছে: ' + (result.message || result.error || JSON.stringify(result)));
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'অর্ডার কনফার্ম করুন';
-          }
-        }
-      } catch (err) {
-        console.error('Error:', err);
-        alert('নেটওয়ার্ক সমস্যা বা সার্ভার রেসপন্স ভুল! আবার চেষ্টা করুন।');
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'অর্ডার কনফার্ম করুন';
-      }
+    if (result && (result.status === true || result.status === "success") && result.payment_url) {
+      localStorage.setItem('lastOrder', JSON.stringify(orderData));
+      window.location.href = result.payment_url;
+    } else {
+      alert('পেমেন্ট শুরু করতে সমস্যা হয়েছে: ' + (result.message || result.error || JSON.stringify(result)));
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'অর্ডার কনফার্ম করুন';
+    }
+  } catch (err) {
+    console.error('Error:', err);
+    alert('নেটওয়ার্ক সমস্যা বা সার্ভার রেসপন্স ভুল! আবার চেষ্টা করুন।');
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'অর্ডার কনফার্ম করুন';
+  }
 });
 
     // পেজ লোড হলে সরাসরি প্রোডাক্ট শো হবে
