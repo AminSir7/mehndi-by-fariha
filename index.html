@@ -394,28 +394,41 @@ cancel_url: 'https://aminsir7.github.io/mehndi-by-fariha/cancel.html'
     };
 
     try {
-        const res = await fetch(APPS_SCRIPT_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify(orderData)
-        });
-        
-        const result = await res.json();
+    const res = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: JSON.stringify({
+            action: "CREATE_PAYMENT",
+            orderData: orderData
+        })
+    });
 
-        if (result.status && result.payment_url) {
-            localStorage.setItem('lastOrder', JSON.stringify(orderData));
-            window.location.href = result.payment_url;
-        } else {
-            alert('পেমেন্ট শুরু করতে সমস্যা হয়েছে: ' + (result.message || 'Error'));
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'অর্ডার কনফার্ম করুন';
-        }
-    } catch (err) {
-        console.error('Error:', err);
-        alert('নেটওয়ার্ক সমস্যা! আবার চেষ্টা করুন।');
+    // রেসপন্স টেক্সট আকারে নিয়ে নিরাপদভাবে JSON পার্স করা
+    const rawText = await res.text();
+    let result;
+    try {
+        result = JSON.parse(rawText);
+    } catch (e) {
+        console.error("Raw response failed to parse:", rawText);
+        throw new Error("Invalid response format from server");
+    }
+
+    if (result && result.status && result.payment_url) {
+        localStorage.setItem('lastOrder', JSON.stringify(orderData));
+        window.location.href = result.payment_url;
+    } else {
+        alert('পেমেন্ট শুরু করতে সমস্যা হয়েছে: ' + (result.message || result.error || 'ZiniPay Error'));
         submitBtn.disabled = false;
         submitBtn.textContent = 'অর্ডার কনফার্ম করুন';
     }
+} catch (err) {
+    console.error('Error:', err);
+    alert('নেটওয়ার্ক সমস্যা বা সার্ভার রেসপন্স ভুল! আবার চেষ্টা করুন।');
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'অর্ডার কনফার্ম করুন';
+}
 });
 
     // পেজ লোড হলে সরাসরি প্রোডাক্ট শো হবে
