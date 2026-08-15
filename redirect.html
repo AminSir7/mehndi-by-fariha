@@ -137,7 +137,7 @@
       if (existingRipple) existingRipple.remove();
       btn.appendChild(circle);
 
-      // Trigger standard API logic
+      // Trigger API logic
       startSendingProcess();
     }
 
@@ -147,7 +147,7 @@
       const btnIcon = document.getElementById('btnIcon');
       if (!btn) return;
 
-      btnIcon.style.display = 'none';
+      if (btnIcon) btnIcon.style.display = 'none';
       btnText.innerHTML = '<span class="spinner"></span> পাঠানো হচ্ছে...';
       btn.disabled = true;
 
@@ -205,7 +205,7 @@
       })
       .catch(err => {
         alert("পাঠাতে সমস্যা হয়েছে, আবার চেষ্টা করুন।");
-        btnIcon.style.display = 'inline-block';
+        if (btnIcon) btnIcon.style.display = 'inline-block';
         btnText.innerText = "আপনার অর্ডারটি এডমিনের কাছে পাঠান";
         btn.disabled = false;
       });
