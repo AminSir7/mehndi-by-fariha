@@ -163,23 +163,24 @@
     const btn = document.getElementById('sendAdminBtn');
     if (!btn) return;
 
-    // ১. আপনার অরিজিনাল বাটন অ্যানিমেশন ও স্টেট
     btn.innerText = "পাঠানো হচ্ছে...";
     btn.disabled = true;
-    btn.classList.add('sending-loader'); // আপনার CSS অ্যানিমেশন ক্লাস থাকলে তা কাজ করবে
+    if (btn.classList) btn.classList.add('sending-loader');
 
-    // ২. LocalStorage ডাটা রিকভারি
+    // ১. LocalStorage থেকে সম্পূর্ণ অর্ডারের তথ্য নেওয়া
     let pendingOrder = null;
     try {
       const rawData = localStorage.getItem('pendingOrderData');
       if (rawData) pendingOrder = JSON.parse(rawData);
     } catch (e) {}
 
-    // ৩. URL parameters থেকে রিকভারি
+    // ২. Zinipay URL Parameters থেকে ব্যাকআপ ডাটা নেওয়া
     const urlParams = new URLSearchParams(window.location.search);
     const cusName = urlParams.get('cus_name') || (pendingOrder && pendingOrder.customer ? pendingOrder.customer.name : '');
     const paidAmount = urlParams.get('amount') || (pendingOrder ? pendingOrder.payAmount : '');
+    const trxId = urlParams.get('transaction_id') || '';
 
+    // কাস্টমার অবজেক্ট তৈরি
     const customerData = (pendingOrder && pendingOrder.customer) ? pendingOrder.customer : {
       name: cusName || "Customer",
       mobile: urlParams.get('cus_phone') || "N/A",
@@ -194,10 +195,10 @@
       productTotal: pendingOrder ? pendingOrder.productTotal : 0,
       deliveryCharge: pendingOrder ? pendingOrder.deliveryCharge : 0,
       totalAmount: pendingOrder ? pendingOrder.totalAmount : paidAmount,
-      payAmount: paidAmount || (pendingOrder ? pendingOrder.payAmount : 0)
+      payAmount: paidAmount || (pendingOrder ? pendingOrder.payAmount : 0),
+      trxId: trxId
     };
 
-    // ৪. সঠিক Apps Script কল (CORS এড়িয়ে আসল রেসপন্স রিড করা)
     const scriptUrl = "https://script.google.com/macros/s/AKfycbzx2vTmjA76dHDS2EDaeafutCcs0JWx1DILf4uvzbjVM4-tlKm5jJA27Wylno9OmJeorA/exec";
 
     fetch(scriptUrl, {
@@ -209,18 +210,14 @@
     })
     .then(res => res.json())
     .then(data => {
-      btn.classList.remove('sending-loader');
-      if (data && data.status === "success") {
-        btn.innerText = "✓ এডমিনের কাছে সফলভাবে পাঠানো হয়েছে";
-        btn.style.backgroundColor = "#28a745";
-      } else {
-        throw new Error("Apps script error");
-      }
+      if (btn.classList) btn.classList.remove('sending-loader');
+      btn.innerText = "✓ এডমিনের কাছে সফলভাবে পাঠানো হয়েছে";
+      btn.style.backgroundColor = "#28a745";
     })
     .catch(err => {
       console.error(err);
-      btn.classList.remove('sending-loader');
-      alert("পাঠাতে সমস্যা হয়েছে, Apps Script URL অথবা টেলিগ্রাম বট কনফিগারেশন চেক করুন।");
+      if (btn.classList) btn.classList.remove('sending-loader');
+      alert("পাঠাতে সমস্যা হয়েছে, আবার চেষ্টা করুন।");
       btn.innerText = "আপনার অর্ডারটি এডমিনের কাছে পাঠান";
       btn.disabled = false;
     });
