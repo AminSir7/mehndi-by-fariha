@@ -165,31 +165,45 @@ document.getElementById('sendAdminBtn').addEventListener('click', function() {
   btn.innerText = "পাঠানো হচ্ছে...";
   btn.disabled = true;
 
-  // LocalStorage বা সেশন থেকে সংরক্ষিত অর্ডারের ডাটা
-  const pendingOrder = JSON.parse(localStorage.getItem('pendingOrderData'));
+  // ১. LocalStorage থেকে ডাটা নেওয়া
+  let pendingOrder = null;
+  try {
+    const rawData = localStorage.getItem('pendingOrderData');
+    if (rawData) {
+      pendingOrder = JSON.parse(rawData);
+    }
+  } catch(e) {}
 
-  if (!pendingOrder) {
-    alert("অর্ডারের তথ্য পাওয়া যায়নি!");
-    btn.innerText = "আপনার অর্ডারটি এডমিনের কাছে পাঠান";
-    btn.disabled = false;
-    return;
-  }
+  // ২. যদি LocalStorage এ না থাকে, তবে URL Parameter থেকে রিড করার চেষ্টা
+  const urlParams = new URLSearchParams(window.location.search);
+  const cusName = urlParams.get('cus_name') || (pendingOrder && pendingOrder.customer ? pendingOrder.customer.name : '');
+  const paidAmount = urlParams.get('amount') || (pendingOrder ? pendingOrder.payAmount : '');
 
-  // Apps Script-এ শুধু টেলিগ্রাম পাঠানোর রিকোয়েস্ট
-  fetch("https://script.google.com/macros/s/AKfycbzx2vTmjA76dHDS2EDaeafutCcs0JWx1DILf4uvzbjVM4-tlKm5jJA27Wylno9OmJeorA/exec", {
-  method: "POST",
-  headers: {
-    "Content-Type": "text/plain;charset=utf-8"
-  },
-  body: JSON.stringify({
-      action: "SEND_TELEGRAM",
-      customer: pendingOrder.customer,
-      cartItems: pendingOrder.cartItems,
-      productTotal: pendingOrder.productTotal,
-      deliveryCharge: pendingOrder.deliveryCharge,
-      totalAmount: pendingOrder.totalAmount,
-      payAmount: pendingOrder.payAmount
-    })
+  // কাস্টমার অবজেক্ট তৈরি
+  const customerData = (pendingOrder && pendingOrder.customer) ? pendingOrder.customer : {
+    name: cusName || "Customer",
+    mobile: urlParams.get('cus_phone') || "N/A",
+    district: urlParams.get('district') || "N/A",
+    address: urlParams.get('address') || "N/A"
+  };
+
+  const payloadData = {
+    action: "SEND_TELEGRAM",
+    customer: customerData,
+    cartItems: pendingOrder ? pendingOrder.cartItems : [],
+    productTotal: pendingOrder ? pendingOrder.productTotal : 0,
+    deliveryCharge: pendingOrder ? pendingOrder.deliveryCharge : 0,
+    totalAmount: pendingOrder ? pendingOrder.totalAmount : paidAmount,
+    payAmount: paidAmount || (pendingOrder ? pendingOrder.payAmount : 0)
+  };
+
+  // Apps Script-এ রিকোয়েস্ট পাঠানো
+  fetch("https://script.google.com/macros/s/AKfycbzx2vTmjA76dHDS2EDaeafutCcs0JWx1DlLF4uvzbjVM4-t1Km5jJA27Wylno90mJeorA/exec", {
+    method: "POST",
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+    body: JSON.stringify(payloadData)
   })
   .then(res => res.json())
   .then(data => {
