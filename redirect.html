@@ -3,55 +3,290 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Confirmed | Mehndi By Fariha</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Order Confirmation - Mehndi By Fariha</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Hind Siliguri', sans-serif;
-            background: linear-gradient(135deg, #f5edff 0%, #e9d5ff 100%);
-            min-height: 100vh;
+        :root {
+            --primary: #8a64d6;
+            --primary-dark: #6c47b5;
+            --bg-lavender: #f3effe;
+            --card-bg: #ffffff;
+            --text-color: #4a3e56;
         }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 10px 40px rgba(126, 34, 206, 0.15);
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-lavender);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-color);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px 25px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(138, 100, 214, 0.15);
+            text-align: center;
+            border: 1px solid #e2d7f8;
+        }
+
+        .success-icon {
+            width: 70px;
+            height: 70px;
+            background: #e8dbfc;
+            color: var(--primary);
+            font-size: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+        }
+
+        h2 {
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+            font-size: 22px;
+        }
+
+        p.sub {
+            font-size: 14px;
+            color: #7a6b8a;
+            margin-bottom: 20px;
+        }
+
+        .order-summary {
+            background: #faf8ff;
+            border: 1px dashed #cbb8f0;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: left;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .order-summary div {
+            margin-bottom: 8px;
+        }
+        .order-summary div:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Send Button */
+        .btn-send {
+            background: linear-gradient(135deg, #9b72cf, #7b52ab);
+            color: #fff;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(138, 100, 214, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-send:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(138, 100, 214, 0.4);
+        }
+
+        .btn-send:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Animation Modal Container */
+        .anim-container {
+            display: none;
+            margin-top: 20px;
+        }
+
+        /* Message Icons Animation */
+        .icon-anim-box {
+            position: relative;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 15px;
+        }
+
+        .msg-icon {
+            font-size: 28px;
+            color: var(--primary);
+            animation: bounce 1.2s infinite alternate ease-in-out;
+        }
+
+        .msg-icon.plane {
+            animation: fly 1.5s infinite linear;
+        }
+
+        @keyframes bounce {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-12px) scale(1.1); color: #6c47b5; }
+        }
+
+        @keyframes fly {
+            0% { transform: translate(-10px, 10px) scale(0.8); opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { transform: translate(15px, -15px) scale(1.1); opacity: 0; }
+        }
+
+        /* Progress Bar */
+        .progress-box {
+            background: #e9e1f7;
+            border-radius: 20px;
+            height: 18px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #8a64d6, #5c35a6);
+            height: 100%;
+            width: 0%;
+            transition: width 0.1s ease;
+            border-radius: 20px;
+        }
+
+        .progress-text {
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--primary-dark);
+            margin-top: 8px;
+        }
+
+        .sent-success-msg {
+            display: none;
+            color: #2e7d32;
+            font-weight: 600;
+            margin-top: 15px;
+            font-size: 15px;
         }
     </style>
 </head>
-<body class="flex items-center justify-center p-4 min-h-screen">
-    <div class="glass-card max-w-md w-full rounded-3xl p-8 text-center space-y-6">
-        <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto text-4xl shadow-inner">
-            <i class="fas fa-check-circle"></i>
-        </div>
+<body>
 
-        <div class="space-y-2">
-            <h2 class="text-2xl font-bold text-purple-950">আপনার অর্ডারটি কনফার্ম হয়েছে!</h2>
-            <p class="text-sm text-gray-600">আমাদের সাথে থাকার জন্য আপনাকে ধন্যবাদ। আমরা শীঘ্রই আপনার সাথে যোগাযোগ করবো।</p>
-        </div>
+<div class="card">
+    <div class="success-icon">
+        <i class="fa-solid fa-check"></i>
+    </div>
+    <h2>অর্ডার সফল হয়েছে!</h2>
+    <p class="sub">আপনার অর্ডারটি নিশ্চিত করতে নিচের বাটনে ক্লিক করুন</p>
 
-        <div id="orderDetails" class="bg-white/40 rounded-2xl p-4 text-left text-sm space-y-2 text-gray-700">
-            <!-- Dynamic Data Load -->
-        </div>
-
-        <a href="index.html" class="block w-full bg-purple-700 hover:bg-purple-800 text-white font-bold py-3 rounded-xl shadow-lg transition">
-            হোম পেজে ফিরে যান
-        </a>
+    <div class="order-summary" id="summaryBox">
+        <!-- JS দিয়ে ডাটা লোড হবে -->
     </div>
 
-    <script>
-        const data = JSON.parse(localStorage.getItem('lastOrder'));
-        if (data) {
-            document.getElementById('orderDetails').innerHTML = `
-                <p><strong>প্রোডাক্ট:</strong> ${data.product}</p>
-                <p><strong>নাম:</strong> ${data.customer.name}</p>
-                <p><strong>মোবাইল:</strong> ${data.customer.mobile}</p>
-                <p><strong>জেলা:</strong> ${data.customer.district}</p>
-                <p><strong>সর্বমোট মূল্য:</strong> ৳ ${data.total}</p>
-            `;
+    <button id="sendAdminBtn" class="btn-send" onclick="startSendingProcess()">
+        <i class="fa-paper-plane fa-regular"></i> আপনার অর্ডারটি এডমিনের কাছে পাঠান
+    </button>
+
+    <!-- Animation Section -->
+    <div class="anim-container" id="animBox">
+        <div class="icon-anim-box">
+            <i class="fa-solid fa-envelope-open-text msg-icon"></i>
+            <i class="fa-solid fa-paper-plane msg-icon plane"></i>
+        </div>
+        <div class="progress-box">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="progress-text" id="progressText">0%</div>
+    </div>
+
+    <div class="sent-success-msg" id="sentMsg">
+        <i class="fa-solid fa-circle-check"></i> এডমিনের কাছে সফলভাবে অর্ডারটি পাঠানো হয়েছে!
+    </div>
+</div>
+
+<script>
+    // Google Apps Script URL (আপনার মোতায়েনকৃত Web App URL টি এখানে বসাবেন)
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzx2vTmjA76dHDS2EDaeafutCcs0JWx1DILf4uvzbjVM4-tlKm5jJA27Wylno9OmJeorA/exec";
+
+    let lastOrder = {};
+    try {
+        lastOrder = JSON.parse(localStorage.getItem('lastOrder')) || {};
+    } catch(e) {}
+
+    // UI Summary Display
+    const summaryBox = document.getElementById('summaryBox');
+    if(lastOrder.product) {
+        summaryBox.innerHTML = `
+            <div><strong>প্রোডাক্ট:</strong> ${lastOrder.product}</div>
+            <div><strong>নাম:</strong> ${lastOrder.customer?.name || 'N/A'}</div>
+            <div><strong>মোবাইল:</strong> ${lastOrder.customer?.mobile || 'N/A'}</div>
+            <div><strong>জেলা:</strong> ${lastOrder.customer?.district || 'N/A'}</div>
+            <div><strong>সর্বমোট মূল্য:</strong> ৳${lastOrder.total || 0}</div>
+        `;
+    } else {
+        summaryBox.innerHTML = `<div>অর্ডারের তথ্য পাওয়া যায়নি।</div>`;
+    }
+
+    function startSendingProcess() {
+        const btn = document.getElementById('sendAdminBtn');
+        const animBox = document.getElementById('animBox');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const sentMsg = document.getElementById('sentMsg');
+
+        btn.disabled = true;
+        btn.style.display = 'none';
+        animBox.style.display = 'block';
+
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += 2;
+            if (progress > 100) progress = 100;
+
+            progressBar.style.width = progress + '%';
+            progressText.textContent = progress + '% পাঠানো হচ্ছে...';
+
+            if (progress >= 100) {
+                clearInterval(interval);
+                sendDataToTelegram();
+            }
+        }, 40); // 2 sec total animation
+    }
+
+    async function sendDataToTelegram() {
+        try {
+            await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify({
+                    action: "CONFIRMED_ORDER_SEND",
+                    orderData: lastOrder
+                })
+            });
+
+            document.getElementById('animBox').style.display = 'none';
+            document.getElementById('sentMsg').style.display = 'block';
+        } catch (err) {
+            console.error(err);
+            alert("অর্ডার পাঠাতে সমস্যা হয়েছে, অনুগ্রহ করে আবার চেষ্টা করুন।");
+            document.getElementById('sendAdminBtn').style.display = 'flex';
+            document.getElementById('sendAdminBtn').disabled = false;
+            document.getElementById('animBox').style.display = 'none';
         }
-    </script>
+    }
+</script>
+
 </body>
 </html>
