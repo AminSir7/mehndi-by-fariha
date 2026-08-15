@@ -418,7 +418,7 @@
 
     const baseUrl = window.location.origin;
 
-    const selectedPaymentOption = document.querySelector('input[name="paymentOption"]:checked').value;
+    const selectedPaymentOption = "ADVANCE_DELIVERY";
 
       const orderData = {
         product: selectedProduct.name,
@@ -437,25 +437,6 @@
       };
 
       try {
-        if (selectedPaymentOption === "COD") {
-          // ২য় অপশন (ক্যাশ অন ডেলিভারি): ZiniPay পেমেন্ট পেজে যাবে না
-          const payload = {
-            ...orderData,
-            payAmount: 0,
-            action: "COD_ORDER"
-          };
-
-          await fetch(APPS_SCRIPT_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify(payload)
-          });
-
-          // কাস্টমারকে সরাসরি সফল পেজে পাঠাবে
-          localStorage.setItem('lastOrder', JSON.stringify(orderData));
-          window.location.href = orderData.redirect_url + '?type=cod';
-
-        } else {
           // ১ম অপশন (এডভান্স ডেলিভারি চার্জ): ZiniPay পেমেন্ট পেজে যাবে
           const payload = {
             ...orderData,
