@@ -159,58 +159,72 @@
 </div>
 
 <script>
-    // 'আপনার অর্ডারটি এডমিনের কাছে পাঠান' বাটনের ক্লিক ইভেন্ট
-document.getElementById('sendAdminBtn').addEventListener('click', function() {
-  const btn = this;
-  btn.innerText = "পাঠানো হচ্ছে...";
-  btn.disabled = true;
+  function startSendingProcess() {
+    const btn = document.getElementById('sendAdminBtn');
+    if (!btn) return;
 
-  let pendingOrder = null;
-  try {
-    const rawData = localStorage.getItem('pendingOrderData');
-    if (rawData) pendingOrder = JSON.parse(rawData);
-  } catch(e) {}
+    // ১. আপনার অরিজিনাল বাটন অ্যানিমেশন ও স্টেট
+    btn.innerText = "পাঠানো হচ্ছে...";
+    btn.disabled = true;
+    btn.classList.add('sending-loader'); // আপনার CSS অ্যানিমেশন ক্লাস থাকলে তা কাজ করবে
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const cusName = urlParams.get('cus_name') || (pendingOrder && pendingOrder.customer ? pendingOrder.customer.name : '');
-  const paidAmount = urlParams.get('amount') || (pendingOrder ? pendingOrder.payAmount : '');
+    // ২. LocalStorage ডাটা রিকভারি
+    let pendingOrder = null;
+    try {
+      const rawData = localStorage.getItem('pendingOrderData');
+      if (rawData) pendingOrder = JSON.parse(rawData);
+    } catch (e) {}
 
-  const customerData = (pendingOrder && pendingOrder.customer) ? pendingOrder.customer : {
-    name: cusName || "Customer",
-    mobile: urlParams.get('cus_phone') || "N/A",
-    district: urlParams.get('district') || "N/A",
-    address: urlParams.get('address') || "N/A"
-  };
+    // ৩. URL parameters থেকে রিকভারি
+    const urlParams = new URLSearchParams(window.location.search);
+    const cusName = urlParams.get('cus_name') || (pendingOrder && pendingOrder.customer ? pendingOrder.customer.name : '');
+    const paidAmount = urlParams.get('amount') || (pendingOrder ? pendingOrder.payAmount : '');
 
-  const payloadData = {
-    action: "SEND_TELEGRAM",
-    customer: customerData,
-    cartItems: pendingOrder ? pendingOrder.cartItems : [],
-    productTotal: pendingOrder ? pendingOrder.productTotal : 0,
-    deliveryCharge: pendingOrder ? pendingOrder.deliveryCharge : 0,
-    totalAmount: pendingOrder ? pendingOrder.totalAmount : paidAmount,
-    payAmount: paidAmount || (pendingOrder ? pendingOrder.payAmount : 0)
-  };
+    const customerData = (pendingOrder && pendingOrder.customer) ? pendingOrder.customer : {
+      name: cusName || "Customer",
+      mobile: urlParams.get('cus_phone') || "N/A",
+      district: urlParams.get('district') || "N/A",
+      address: urlParams.get('address') || "N/A"
+    };
 
-  // mode: 'no-cors' যোগ করা হয়েছে যাতে Google Apps Script এরর না দেয়
-  fetch("https://script.google.com/macros/s/AKfycbzx2vTmjA76dHDS2EDaeafutCcs0JWx1DlLF4uvzbjVM4-t1Km5jJA27Wylno90mJeorA/exec", {
-    method: "POST",
-    mode: "no-cors",
-    headers: {
-      "Content-Type": "text/plain;charset=utf-8"
-    },
-    body: JSON.stringify(payloadData)
-  })
-  .then(() => {
-    btn.innerText = "✓ এডমিনের কাছে সফলভাবে পাঠানো হয়েছে";
-    btn.style.backgroundColor = "#28a745";
-  })
-  .catch(err => {
-    alert("পাঠাতে সমস্যা হয়েছে, আবার চেষ্টা করুন।");
-    btn.innerText = "আপনার অর্ডারটি এডমিনের কাছে পাঠান";
-    btn.disabled = false;
-  });
-});
+    const payloadData = {
+      action: "SEND_TELEGRAM",
+      customer: customerData,
+      cartItems: pendingOrder ? pendingOrder.cartItems : [],
+      productTotal: pendingOrder ? pendingOrder.productTotal : 0,
+      deliveryCharge: pendingOrder ? pendingOrder.deliveryCharge : 0,
+      totalAmount: pendingOrder ? pendingOrder.totalAmount : paidAmount,
+      payAmount: paidAmount || (pendingOrder ? pendingOrder.payAmount : 0)
+    };
+
+    // ৪. সঠিক Apps Script কল (CORS এড়িয়ে আসল রেসপন্স রিড করা)
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbzx2vTmjA76dHDS2EDaeafutCcs0JWx1DlLF4uvzbjVM4-t1Km5jJA27Wylno90mJeorA/exec";
+
+    fetch(scriptUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      body: JSON.stringify(payloadData)
+    })
+    .then(res => res.json())
+    .then(data => {
+      btn.classList.remove('sending-loader');
+      if (data && data.status === "success") {
+        btn.innerText = "✓ এডমিনের কাছে সফলভাবে পাঠানো হয়েছে";
+        btn.style.backgroundColor = "#28a745";
+      } else {
+        throw new Error("Apps script error");
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      btn.classList.remove('sending-loader');
+      alert("পাঠাতে সমস্যা হয়েছে, Apps Script URL অথবা টেলিগ্রাম বট কনফিগারেশন চেক করুন।");
+      btn.innerText = "আপনার অর্ডারটি এডমিনের কাছে পাঠান";
+      btn.disabled = false;
+    });
+  }
 </script>
 
 </body>
