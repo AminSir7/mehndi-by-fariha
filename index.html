@@ -368,45 +368,54 @@
 
     // অর্ডার সাবমিট এবং Telegram API-তে পাঠানো
     document.getElementById('orderForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'পেমেন্ট পেজে নেওয়া হচ্ছে...';
+
+    const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
+
+    const orderData = {
+        product: selectedProduct.name,
+        price: selectedProduct.price,
+        deliveryCharge: selectedDeliveryCharge,
+        total: selectedProduct.price + selectedDeliveryCharge,
+        customer: {
+            name: document.getElementById('fullName').value,
+            mobile: document.getElementById('mobileNumber').value,
+            district: document.getElementById('districtSelect').value,
+            address: document.getElementById('fullAddress').value
+        },
+        redirect_url: baseUrl + '/redirect.html',
+        cancel_url: baseUrl + '/cancel.html'
+    };
+
+    try {
+        const res = await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify(orderData)
+        });
         
-        const submitBtn = document.getElementById('submitBtn');
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'অর্ডার প্রসেসিং হচ্ছে...';
+        const result = await res.json();
 
-        const orderData = {
-            product: selectedProduct.name,
-            price: selectedProduct.price,
-            deliveryCharge: selectedDeliveryCharge,
-            total: selectedProduct.price + selectedDeliveryCharge,
-            customer: {
-                name: document.getElementById('fullName').value,
-                mobile: document.getElementById('mobileNumber').value,
-                district: document.getElementById('districtSelect').value,
-                address: document.getElementById('fullAddress').value
-            },
-            paymentOption: document.querySelector('input[name="paymentOption"]:checked').value
-        };
-
-        try {
-            await fetch(APPS_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(orderData)
-            });
-
+        if (result.status && result.payment_url) {
             localStorage.setItem('lastOrder', JSON.stringify(orderData));
-            window.location.href = 'redirect.html';
-        } catch (err) {
-            console.error('Error submitting order:', err);
-            alert('অর্ডার জমা দিতে সমস্যা হয়েছে, আবার চেষ্টা করুন।');
+            // ZiniPay গেটওয়ে পেজে রিডাইরেক্ট
+            window.location.href = result.payment_url;
+        } else {
+            alert('পেমেন্ট শুরু করতে সমস্যা হয়েছে: ' + (result.message || 'Error'));
             submitBtn.disabled = false;
             submitBtn.textContent = 'অর্ডার কনফার্ম করুন';
         }
-    });
+    } catch (err) {
+        console.error('Error:', err);
+        alert('নেটওয়ার্ক সমস্যা! আবার চেষ্টা করুন।');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'অর্ডার কনফার্ম করুন';
+    }
+});
 
     // পেজ লোড হলে সরাসরি প্রোডাক্ট শো হবে
     renderProducts(sampleProducts);
