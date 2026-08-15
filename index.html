@@ -374,13 +374,15 @@
     submitBtn.disabled = true;
     submitBtn.textContent = 'পেমেন্ট পেজে নেওয়া হচ্ছে...';
 
-    const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
+    const baseUrl = window.location.origin;
 
     const orderData = {
         product: selectedProduct.name,
         price: selectedProduct.price,
         deliveryCharge: selectedDeliveryCharge,
         total: selectedProduct.price + selectedDeliveryCharge,
+        // 👇 ZiniPay-তে চার্জ করার জন্য শুধু ডেলিভারি চার্জের অ্যামাউন্ট পাঠানো হচ্ছে
+        payAmount: selectedDeliveryCharge, 
         customer: {
             name: document.getElementById('fullName').value,
             mobile: document.getElementById('mobileNumber').value,
@@ -402,7 +404,6 @@
 
         if (result.status && result.payment_url) {
             localStorage.setItem('lastOrder', JSON.stringify(orderData));
-            // ZiniPay গেটওয়ে পেজে রিডাইরেক্ট
             window.location.href = result.payment_url;
         } else {
             alert('পেমেন্ট শুরু করতে সমস্যা হয়েছে: ' + (result.message || 'Error'));
