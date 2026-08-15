@@ -159,76 +159,49 @@
 </div>
 
 <script>
-    // ⚠️ আপনার Google Apps Script Web App URL টি এখানে বসাবেন
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzx2vTmjA76dHDS2EDaeafutCcs0JWx1DILf4uvzbjVM4-tlKm5jJA27Wylno9OmJeorA/exec";
+    // 'আপনার অর্ডারটি এডমিনের কাছে পাঠান' বাটনের ক্লিক ইভেন্ট
+document.getElementById('sendAdminBtn').addEventListener('click', function() {
+  const btn = this;
+  btn.innerText = "পাঠানো হচ্ছে...";
+  btn.disabled = true;
 
-    let lastOrder = {};
-    try {
-        lastOrder = JSON.parse(localStorage.getItem('lastOrder')) || {};
-    } catch(e) {}
+  // LocalStorage বা সেশন থেকে সংরক্ষিত অর্ডারের ডাটা
+  const pendingOrder = JSON.parse(localStorage.getItem('pendingOrderData'));
 
-    const summaryBox = document.getElementById('summaryBox');
-    if(lastOrder.product) {
-        summaryBox.innerHTML = `
-            <div><strong>প্রোডাক্ট:</strong> ${lastOrder.product}</div>
-            <div><strong>নাম:</strong> ${lastOrder.customer?.name || 'N/A'}</div>
-            <div><strong>মোবাইল:</strong> ${lastOrder.customer?.mobile || 'N/A'}</div>
-            <div><strong>জেলা:</strong> ${lastOrder.customer?.district || 'N/A'}</div>
-            <div><strong>সর্বমোট মূল্য:</strong> ৳${lastOrder.total || 0}</div>
-        `;
-    } else {
-        summaryBox.innerHTML = `<div>অর্ডারের তথ্য পাওয়া যায়নি।</div>`;
-    }
+  if (!pendingOrder) {
+    alert("অর্ডারের তথ্য পাওয়া যায়নি!");
+    btn.innerText = "আপনার অর্ডারটি এডমিনের কাছে পাঠান";
+    btn.disabled = false;
+    return;
+  }
 
-    function startSendingProcess() {
-        const btn = document.getElementById('sendAdminBtn');
-        const animBox = document.getElementById('animBox');
-        const progressBar = document.getElementById('progressBar');
-        const progressText = document.getElementById('progressText');
-
-        btn.style.display = 'none';
-        animBox.style.display = 'block';
-
-        let progress = 0;
-        const interval = setInterval(() => {
-            progress += 4;
-            if (progress > 100) progress = 100;
-
-            progressBar.style.width = progress + '%';
-            progressText.textContent = progress + '% পাঠানো হচ্ছে...';
-
-            if (progress >= 100) {
-                clearInterval(interval);
-                sendDataToTelegram();
-            }
-        }, 50);
-    }
-
-    function sendDataToTelegram() {
-    // Apps Script-এ JSON আকারে অর্ডার ডেটা পাঠানো
-    fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'text/plain;charset=utf-8'
-        },
-        body: JSON.stringify({
-            action: "CONFIRMED_ORDER_SEND",
-            ...lastOrder
-        })
+  // Apps Script-এ শুধু টেলিগ্রাম পাঠানোর রিকোয়েস্ট
+  fetch("https://script.google.com/macros/s/AKfycbzx2vTmjA76dHDS2EDaeafutCcs0JWx1DILf4uvzbjVM4-tlKm5jJA27Wylno9OmJeorA/exec", {
+  method: "POST",
+  headers: {
+    "Content-Type": "text/plain;charset=utf-8"
+  },
+  body: JSON.stringify({
+      action: "SEND_TELEGRAM",
+      customer: pendingOrder.customer,
+      cartItems: pendingOrder.cartItems,
+      productTotal: pendingOrder.productTotal,
+      deliveryCharge: pendingOrder.deliveryCharge,
+      totalAmount: pendingOrder.totalAmount,
+      payAmount: pendingOrder.payAmount
     })
-    .then(res => res.text())
-    .then(data => {
-        // সফলভাবে পাঠালে এনিমেশন বন্ধ করে সাকসেস মেসেজ দেখাবে
-        document.getElementById('animBox').style.display = 'none';
-        document.getElementById('sentMsg').style.display = 'block';
-    })
-    .catch(err => {
-        console.error(err);
-        alert("সমস্যা হয়েছে! আবার চেষ্টা করুন।");
-        document.getElementById('animBox').style.display = 'none';
-        document.getElementById('sendAdminBtn').style.display = 'block';
-    });
-}
+  })
+  .then(res => res.json())
+  .then(data => {
+    btn.innerText = "✓ এডমিনের কাছে সফলভাবে পাঠানো হয়েছে";
+    btn.style.backgroundColor = "#28a745";
+  })
+  .catch(err => {
+    alert("পাঠাতে সমস্যা হয়েছে, আবার চেষ্টা করুন।");
+    btn.innerText = "আপনার অর্ডারটি এডমিনের কাছে পাঠান";
+    btn.disabled = false;
+  });
+});
 </script>
 
 </body>
