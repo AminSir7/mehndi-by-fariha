@@ -431,6 +431,23 @@ document.getElementById('orderForm').addEventListener('submit', async function(e
     redirect_url: 'https://aminsir7.github.io/mehndi-by-fariha/redirect.html',
     cancel_url: 'https://aminsir7.github.io/mehndi-by-fariha/cancel.html'
   };
+  
+  // ZiniPay-তে যাওয়ার ঠিক আগে LocalStorage-এ সব তথ্য সেভ করা
+  const pendingOrderData = {
+    customer: {
+      name: document.getElementById('fullName').value,
+      mobile: document.getElementById('mobileNumber').value,
+      district: document.getElementById('districtSelect').value,
+      address: document.getElementById('fullAddress').value
+    },
+    cartItems: selectedProduct ? [{ name: selectedProduct.name, price: selectedProduct.price, qty: 1 }] : [],
+    productTotal: selectedProduct ? selectedProduct.price : 0,
+    deliveryCharge: selectedDeliveryCharge || 0,
+    totalAmount: orderData.total,
+    payAmount: orderData.total
+  };
+
+  localStorage.setItem('pendingOrderData', JSON.stringify(pendingOrderData));
 
   try {
     const payload = {
