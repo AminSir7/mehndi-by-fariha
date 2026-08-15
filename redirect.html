@@ -205,24 +205,30 @@
     }
 
     function sendDataToTelegram() {
-        // no-cors সমস্যার সমাধানের জন্য URLSearchParams আকারে ডাটা পাঠানো হচ্ছে
-        const payload = new URLSearchParams();
-        payload.append("action", "CONFIRMED_ORDER_SEND");
-        payload.append("orderData", JSON.stringify(lastOrder));
-
-        fetch(APPS_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: payload.toString()
-        }).then(() => {
-            document.getElementById('animBox').style.display = 'none';
-            document.getElementById('sentMsg').style.display = 'block';
-        }).catch(err => {
-            console.error(err);
-            alert("সমস্যা হয়েছে! আবার চেষ্টা করুন।");
-        });
-    }
+    // Apps Script-এ JSON আকারে অর্ডার ডেটা পাঠানো
+    fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: JSON.stringify({
+            action: "CONFIRMED_ORDER_SEND",
+            ...lastOrder
+        })
+    })
+    .then(res => res.text())
+    .then(data => {
+        // সফলভাবে পাঠালে এনিমেশন বন্ধ করে সাকসেস মেসেজ দেখাবে
+        document.getElementById('animBox').style.display = 'none';
+        document.getElementById('sentMsg').style.display = 'block';
+    })
+    .catch(err => {
+        console.error(err);
+        alert("সমস্যা হয়েছে! আবার চেষ্টা করুন।");
+        document.getElementById('animBox').style.display = 'none';
+        document.getElementById('sendAdminBtn').style.display = 'block';
+    });
+}
 </script>
 
 </body>
