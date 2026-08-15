@@ -376,61 +376,81 @@
 
     const baseUrl = window.location.origin;
 
-    const orderData = {
+    const selectedPaymentOption = document.querySelector('input[name="paymentOption"]:checked').value;
+
+      const orderData = {
         product: selectedProduct.name,
         price: selectedProduct.price,
         deliveryCharge: selectedDeliveryCharge,
         total: selectedProduct.price + selectedDeliveryCharge,
-        // 👇 ZiniPay-তে চার্জ করার জন্য শুধু ডেলিভারি চার্জের অ্যামাউন্ট পাঠানো হচ্ছে
-        payAmount: selectedDeliveryCharge, 
+        paymentOption: selectedPaymentOption,
         customer: {
-            name: document.getElementById('fullName').value,
-            mobile: document.getElementById('mobileNumber').value,
-            district: document.getElementById('districtSelect').value,
-            address: document.getElementById('fullAddress').value
+          name: document.getElementById('fullName').value,
+          mobile: document.getElementById('mobileNumber').value,
+          district: document.getElementById('districtSelect').value,
+          address: document.getElementById('fullAddress').value
         },
         redirect_url: 'https://aminsir7.github.io/mehndi-by-fariha/redirect.html',
-cancel_url: 'https://aminsir7.github.io/mehndi-by-fariha/cancel.html'
-    };
+        cancel_url: 'https://aminsir7.github.io/mehndi-by-fariha/cancel.html'
+      };
 
-    try {
-    // orderData-এর সাথে action যোগ করে সরাসরি পাঠানো হচ্ছে
-    const payload = {
-        ...orderData,
-        action: "CREATE_PAYMENT"
-    };
+      try {
+        if (selectedPaymentOption === "COD") {
+          // ২য় অপশন (ক্যাশ অন ডেলিভারি): ZiniPay পেমেন্ট পেজে যাবে না
+          const payload = {
+            ...orderData,
+            payAmount: 0,
+            action: "COD_ORDER"
+          };
 
-    const res = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'text/plain;charset=utf-8'
-        },
-        body: JSON.stringify(payload)
-    });
+          await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload)
+          });
 
-    const rawText = await res.text();
-    let result;
-    try {
-        result = JSON.parse(rawText);
-    } catch (e) {
-        console.error("Raw response failed to parse:", rawText);
-        throw new Error("Invalid response format from server");
-    }
+          // কাস্টমারকে সরাসরি সফল পেজে পাঠাবে
+          localStorage.setItem('lastOrder', JSON.stringify(orderData));
+          window.location.href = orderData.redirect_url + '?type=cod';
 
-    if (result && (result.status === true || result.status === "success") && result.payment_url) {
-        localStorage.setItem('lastOrder', JSON.stringify(orderData));
-        window.location.href = result.payment_url;
-    } else {
-        alert('পেমেন্ট শুরু করতে সমস্যা হয়েছে: ' + (result.message || result.error || JSON.stringify(result)));
+        } else {
+          // ১ম অপশন (এডভান্স ডেলিভারি চার্জ): ZiniPay পেমেন্ট পেজে যাবে
+          const payload = {
+            ...orderData,
+            payAmount: selectedDeliveryCharge,
+            action: "CREATE_PAYMENT"
+          };
+
+          const res = await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload)
+          });
+
+          const rawText = await res.text();
+          let result;
+          try {
+            result = JSON.parse(rawText);
+          } catch (e) {
+            console.error("Raw response failed to parse:", rawText);
+            throw new Error("Invalid response format from server");
+          }
+
+          if (result && (result.status === true || result.status === "success") && result.payment_url) {
+            localStorage.setItem('lastOrder', JSON.stringify(orderData));
+            window.location.href = result.payment_url;
+          } else {
+            alert('পেমেন্ট শুরু করতে সমস্যা হয়েছে: ' + (result.message || result.error || JSON.stringify(result)));
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'অর্ডার কনফার্ম করুন';
+          }
+        }
+      } catch (err) {
+        console.error('Error:', err);
+        alert('নেটওয়ার্ক সমস্যা বা সার্ভার রেসপন্স ভুল! আবার চেষ্টা করুন।');
         submitBtn.disabled = false;
         submitBtn.textContent = 'অর্ডার কনফার্ম করুন';
-    }
-} catch (err) {
-    console.error('Error:', err);
-    alert('নেটওয়ার্ক সমস্যা বা সার্ভার রেসপন্স ভুল! আবার চেষ্টা করুন।');
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'অর্ডার কনফার্ম করুন';
-}
+      }
 });
 
     // পেজ লোড হলে সরাসরি প্রোডাক্ট শো হবে
