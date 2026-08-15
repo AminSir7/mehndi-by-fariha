@@ -1,5 +1,31 @@
 <!DOCTYPE html>
 <html lang="bn">
+<!-- পাতার ব্যাকগ্রাউন্ড কন্টেইনার -->
+<div class="leaf-container" id="leafContainer"></div>
+
+<script>
+  // স্ক্রিনের চারপাশ থেকে এলোমেলো পাতা তৈরির স্ক্রিপ্ট
+  const leafContainer = document.getElementById('leafContainer');
+  const leaves = ['🍃', '🍂', '🌿']; // পাতাগুলোর সিম্বল
+
+  function createLeaf() {
+    const leaf = document.createElement('div');
+    leaf.classList.add('leaf');
+    leaf.innerText = leaves[Math.floor(Math.random() * leaves.length)];
+    leaf.style.left = Math.random() * 100 + 'vw';
+    leaf.style.animationDuration = (Math.random() * 5 + 5) + 's'; // ৫ থেকে ১০ সেকেন্ড সময় নেবে
+    leaf.style.fontSize = (Math.random() * 12 + 14) + 'px';
+    
+    leafContainer.appendChild(leaf);
+
+    setTimeout(() => {
+      leaf.remove();
+    }, 10000);
+  }
+
+  // প্রতি ৫০০ মিলি-সেকেন্ডে একটি করে নতুন পাতা পড়বে
+  setInterval(createLeaf, 500);
+</script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -80,6 +106,39 @@
             outline: none;
         }
     </style>
+<style>
+  /* পাতা পড়ার অ্যানিমেশন স্টাইল */
+  .leaf-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .leaf {
+    position: absolute;
+    top: -20px;
+    font-size: 18px;
+    opacity: 0.7;
+    animation: fall linear infinite;
+  }
+  @keyframes fall {
+    0% {
+      transform: translateY(0) rotate(0deg) translateX(0);
+      opacity: 0.8;
+    }
+    50% {
+      transform: translateY(50vh) rotate(180deg) translateX(50px);
+    }
+    100% {
+      transform: translateY(105vh) rotate(360deg) translateX(-50px);
+      opacity: 0.2;
+    }
+  }
+</style>
 </head>
 <body class="text-gray-800 antialiased pb-16">
 
@@ -230,26 +289,9 @@
                         <textarea id="fullAddress" required rows="2" placeholder="বাসা নম্বর, রোড নম্বর, এলাকা, থানা..." class="w-full px-4 py-3 rounded-xl glass-input"></textarea>
                     </div>
 
-                    <!-- Payment Options -->
-                    <div class="space-y-3 pt-2">
-                        <label class="block text-sm font-semibold text-gray-700">পেমেন্ট অপশন নির্বাচন করুন *</label>
-                        
-                        <label class="flex items-start gap-3 p-4 rounded-xl border border-brand-300 bg-white/50 cursor-pointer hover:bg-white/80 transition">
-                            <input type="radio" name="paymentOption" value="ADVANCE_DELIVERY" checked class="mt-1 text-brand-600">
-                            <div>
-                                <span class="font-bold text-gray-800 text-sm">১. ডেলিভারি চার্জ দিয়ে অর্ডার কনফার্ম করুন (Recommended)</span>
-                                <p class="text-xs text-gray-600 mt-1">শুধুমাত্র ডেলিভারি চার্জ পেমেন্ট করবেন, বাকি টাকা প্রোডাক্ট হাতে পেয়ে দিবেন।</p>
-                            </div>
-                        </label>
-
-                        <label class="flex items-start gap-3 p-4 rounded-xl border border-brand-300 bg-white/50 cursor-pointer hover:bg-white/80 transition">
-                            <input type="radio" name="paymentOption" value="COD" class="mt-1 text-brand-600">
-                            <div>
-                                <span class="font-bold text-gray-800 text-sm">২. ক্যাশ অন ডেলিভারি</span>
-                                <p class="text-xs text-gray-600 mt-1">প্রোডাক্ট ও ডেলিভারি চার্জ সমস্ত টাকা ডেলিভারিম্যানের কাছে দিবেন।</p>
-                            </div>
-                        </label>
-                    </div>
+                    <div class="p-3 bg-brand-50 rounded-xl border border-brand-200 text-sm text-brand-800 font-medium">
+  💳 <strong>পেমেন্ট পদ্ধতি:</strong> ডেলিভারি চার্জ অগ্রিম পেমেন্ট করে অর্ডার কনফার্ম করুন।
+</div>
 
                     <button type="submit" id="submitBtn" class="w-full bg-brand-700 hover:bg-brand-800 text-white font-bold py-4 rounded-xl shadow-xl transition text-lg mt-4">
                         অর্ডার কনফার্ম করুন (মোট: <span id="btnTotalPrice">৳ ০</span>)
@@ -475,5 +517,8 @@ if (slider) {
     }, 3000);
 }
 </script>
+<footer class="text-center py-4 text-xs text-gray-500 font-medium">
+  🛡️ Website Protected By AminSir7
+</footer>
 </body>
 </html>
