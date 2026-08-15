@@ -394,18 +394,20 @@ cancel_url: 'https://aminsir7.github.io/mehndi-by-fariha/cancel.html'
     };
 
     try {
+    // orderData-এর সাথে action যোগ করে সরাসরি পাঠানো হচ্ছে
+    const payload = {
+        ...orderData,
+        action: "CREATE_PAYMENT"
+    };
+
     const res = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         headers: {
             'Content-Type': 'text/plain;charset=utf-8'
         },
-        body: JSON.stringify({
-            action: "CREATE_PAYMENT",
-            orderData: orderData
-        })
+        body: JSON.stringify(payload)
     });
 
-    // রেসপন্স টেক্সট আকারে নিয়ে নিরাপদভাবে JSON পার্স করা
     const rawText = await res.text();
     let result;
     try {
@@ -415,11 +417,11 @@ cancel_url: 'https://aminsir7.github.io/mehndi-by-fariha/cancel.html'
         throw new Error("Invalid response format from server");
     }
 
-    if (result && result.status && result.payment_url) {
+    if (result && (result.status === true || result.status === "success") && result.payment_url) {
         localStorage.setItem('lastOrder', JSON.stringify(orderData));
         window.location.href = result.payment_url;
     } else {
-        alert('পেমেন্ট শুরু করতে সমস্যা হয়েছে: ' + (result.message || result.error || 'ZiniPay Error'));
+        alert('পেমেন্ট শুরু করতে সমস্যা হয়েছে: ' + (result.message || result.error || JSON.stringify(result)));
         submitBtn.disabled = false;
         submitBtn.textContent = 'অর্ডার কনফার্ম করুন';
     }
