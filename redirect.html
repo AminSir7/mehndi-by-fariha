@@ -1,228 +1,444 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Confirmation - Mehndi By Fariha</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #8a64d6;
-            --primary-dark: #6c47b5;
-            --bg-lavender: #f3effe;
-            --card-bg: #ffffff;
-            --text-color: #4a3e56;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmation - Mehndi By Fariha</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-lavender: #a285d8;
+      --primary-dark: #5c3596;
+      --soft-bg: #f8f5fe;
+      --card-bg: rgba(255, 255, 255, 0.82);
+      --text-main: #3d2f50;
+      --whatsapp-green: #25d366;
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-lavender);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            color: var(--text-color);
-        }
+    * { box-sizing: border-box; }
 
-        .card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 30px 25px;
-            max-width: 420px;
-            width: 100%;
-            box-shadow: 0 10px 30px rgba(138, 100, 214, 0.15);
-            text-align: center;
-            border: 1px solid #e2d7f8;
-        }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4effc;
+      background-image: 
+        radial-gradient(circle at 5% 5%, rgba(162, 133, 216, 0.25) 0%, transparent 40%),
+        radial-gradient(circle at 95% 95%, rgba(118, 75, 188, 0.2) 0%, transparent 45%);
+      margin: 0;
+      padding: 20px 15px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: var(--text-main);
+      overflow-x: hidden;
+      position: relative;
+    }
 
-        .success-icon {
-            width: 70px;
-            height: 70px;
-            background: #e8dbfc;
-            color: var(--primary);
-            font-size: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 15px;
-        }
+    /* Ambient Floating Blobs */
+    body::before, body::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      z-index: -1;
+    }
+    body::before {
+      width: 300px; height: 300px;
+      background: rgba(182, 153, 235, 0.35);
+      top: 2%; left: 5%;
+      animation: floatAnim 7s ease-in-out infinite alternate;
+    }
+    body::after {
+      width: 280px; height: 280px;
+      background: rgba(140, 98, 205, 0.25);
+      bottom: 2%; right: 5%;
+      animation: floatAnim 9s ease-in-out infinite alternate-reverse;
+    }
 
-        h2 { color: var(--primary-dark); margin-bottom: 8px; font-size: 22px; }
-        p.sub { font-size: 14px; color: #7a6b8a; margin-bottom: 20px; }
+    @keyframes floatAnim {
+      0% { transform: translateY(0px) scale(1); }
+      100% { transform: translateY(-20px) scale(1.05); }
+    }
 
-        .order-summary {
-            background: #faf8ff;
-            border: 1px dashed #cbb8f0;
-            border-radius: 12px;
-            padding: 15px;
-            text-align: left;
-            margin-bottom: 25px;
-            font-size: 14px;
-        }
+    /* Card Wrapper */
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 28px;
+      padding: 35px 24px 25px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(92, 53, 150, 0.12), 0 2px 10px rgba(0,0,0,0.03);
+      text-align: center;
+      border: 1.5px solid rgba(255, 255, 255, 0.9);
+      position: relative;
+    }
 
-        .order-summary div { margin-bottom: 8px; }
-        .order-summary div:last-child { margin-bottom: 0; }
+    /* Header & Greetings */
+    .greeting-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #ede4fc, #e1d3fa);
+      color: var(--primary-dark);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 12px rgba(162, 133, 216, 0.2);
+    }
 
-        .btn-send {
-            background: linear-gradient(135deg, #9b72cf, #7b52ab);
-            color: #fff;
-            border: none;
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(138, 100, 214, 0.3);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
+    .success-icon {
+      width: 70px; height: 70px;
+      background: linear-gradient(135deg, #a285d8, #6c47b5);
+      color: #fff;
+      font-size: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      box-shadow: 0 10px 22px rgba(108, 71, 181, 0.3);
+    }
 
-        .btn-send:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(138, 100, 214, 0.4); }
+    h2 {
+      color: var(--primary-dark);
+      margin: 0 0 6px;
+      font-size: 24px;
+      font-weight: 700;
+    }
 
-        .anim-container { display: none; margin-top: 20px; }
+    p.sub {
+      font-size: 14px;
+      color: #6d5d80;
+      margin: 0 0 20px;
+      line-height: 1.4;
+    }
 
-        .icon-anim-box {
-            position: relative;
-            height: 60px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 25px;
-            margin-bottom: 15px;
-        }
+    /* Summary Box */
+    .order-summary {
+      background: rgba(250, 247, 255, 0.9);
+      border: 1px dashed #cbb8f0;
+      border-radius: 16px;
+      padding: 16px;
+      text-align: left;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    .order-summary div { margin-bottom: 8px; }
+    .order-summary div:last-child { margin-bottom: 0; }
 
-        .msg-icon {
-            font-size: 28px;
-            color: var(--primary);
-            animation: bounce 1.2s infinite alternate ease-in-out;
-        }
+    /* Action Buttons */
+    .btn-main {
+      background: linear-gradient(135deg, #936bd4 0%, #6339a8 100%);
+      color: #fff;
+      border: none;
+      width: 100%;
+      padding: 15px;
+      border-radius: 16px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 8px 22px rgba(99, 57, 168, 0.3);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
 
-        .msg-icon.plane { animation: fly 1.5s infinite linear; }
+    .btn-main:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(99, 57, 168, 0.4);
+    }
 
-        @keyframes bounce { 0% { transform: translateY(0); } 100% { transform: translateY(-12px); color: #6c47b5; } }
-        @keyframes fly { 0% { transform: translate(-10px, 10px); opacity: 0.3; } 50% { opacity: 1; } 100% { transform: translate(15px, -15px); opacity: 0; } }
+    .btn-main:disabled {
+      opacity: 0.9;
+      cursor: not-allowed;
+    }
 
-        .progress-box {
-            background: #e9e1f7;
-            border-radius: 20px;
-            height: 18px;
-            width: 100%;
-            overflow: hidden;
-        }
+    /* Progress & Animations */
+    .anim-container {
+      display: none;
+      margin-top: 18px;
+    }
 
-        .progress-bar {
-            background: linear-gradient(90deg, #8a64d6, #5c35a6);
-            height: 100%;
-            width: 0%;
-            transition: width 0.1s ease;
-            border-radius: 20px;
-        }
+    .progress-box {
+      background: #e8dff7;
+      border-radius: 20px;
+      height: 16px;
+      width: 100%;
+      overflow: hidden;
+      margin-top: 10px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    }
 
-        .progress-text { font-size: 13px; font-weight: bold; color: var(--primary-dark); margin-top: 8px; }
-        .sent-success-msg { display: none; color: #2e7d32; font-weight: 600; margin-top: 15px; font-size: 15px; }
-    </style>
+    .progress-bar {
+      background: linear-gradient(90deg, #a285d8, #5c3596);
+      height: 100%;
+      width: 0%;
+      transition: width 0.15s ease-out;
+      border-radius: 20px;
+    }
+
+    .progress-text {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-top: 6px;
+    }
+
+    /* Secondary Action Buttons */
+    .extra-actions {
+      margin-top: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn-whatsapp {
+      background: #e6f9ed;
+      color: #128c7e;
+      border: 1px solid #b3f0c8;
+      padding: 12px;
+      border-radius: 14px;
+      font-size: 13.5px;
+      font-weight: 600;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: 0.2s ease;
+    }
+
+    .btn-whatsapp:hover {
+      background: #d4f5e0;
+      color: #075e54;
+    }
+
+    .btn-return {
+      background: transparent;
+      color: #6d5d80;
+      border: 1px solid #dcd1f2;
+      padding: 11px;
+      border-radius: 14px;
+      font-size: 13.5px;
+      font-weight: 600;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: 0.2s ease;
+    }
+
+    .btn-return:hover {
+      background: #f1eafd;
+      color: var(--primary-dark);
+    }
+
+    /* Flower Particle Style */
+    .particle {
+      position: absolute;
+      pointer-events: none;
+      font-weight: bold;
+      user-select: none;
+      animation: particleFly 1.8s forwards ease-out;
+      z-index: 99;
+    }
+
+    @keyframes particleFly {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(0.6) rotate(0deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--dx), var(--dy)) scale(1.4) rotate(var(--rot));
+      }
+    }
+
+    /* Footer Branding */
+    .protected-footer {
+      margin-top: 22px;
+      font-size: 11.5px;
+      color: #8c7a9e;
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+  </style>
 </head>
 <body>
 
-<div class="card">
-    <div class="success-icon"><i class="fa-solid fa-check"></i></div>
-    <h2>অর্ডার সফল হয়েছে!</h2>
-    <p class="sub">আপনার অর্ডারটি নিশ্চিত করতে নিচের বাটনে ক্লিক করুন</p>
+<div class="card" id="mainCard">
+  <div class="greeting-badge"><i class="fa-solid fa-heart"></i> শুকরিয়া ও অভিনন্দন!</div>
+  <div class="success-icon"><i class="fa-solid fa-check"></i></div>
+  <h2>অর্ডার এর কার্যক্রম শেষ হয়েছে</h2>
+  <p class="sub">অর্ডারটি ১০০% নিশ্চিত করতে নিচের বাটনে ক্লিক করুন</p>
 
-    <div class="order-summary" id="summaryBox"></div>
+  <div class="order-summary" id="summaryBox"></div>
 
-    <button id="sendAdminBtn" class="btn-send" onclick="startSendingProcess()">
-        <i class="fa-paper-plane fa-regular"></i> আপনার অর্ডারটি এডমিনের কাছে পাঠান
-    </button>
+  <button id="sendAdminBtn" class="btn-main" onclick="startSendingProcess()">
+    <i class="fa-regular fa-paper-plane"></i> এডমিনের কাছে আপনার অর্ডারটি পাঠান
+  </button>
 
-    <div class="anim-container" id="animBox">
-        <div class="icon-anim-box">
-            <i class="fa-solid fa-envelope-open-text msg-icon"></i>
-            <i class="fa-solid fa-paper-plane msg-icon plane"></i>
-        </div>
-        <div class="progress-box">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
-        <div class="progress-text" id="progressText">0%</div>
+  <div class="anim-container" id="animBox">
+    <div class="progress-box">
+      <div class="progress-bar" id="progressBar"></div>
     </div>
+    <div class="progress-text" id="progressText">0%</div>
+  </div>
 
-    <div class="sent-success-msg" id="sentMsg">
-        <i class="fa-solid fa-circle-check"></i> এডমিনের কাছে সফলভাবে অর্ডারটি পাঠানো হয়েছে!
-    </div>
+  <div class="sent-success-msg" id="sentMsg" style="display:none; color:#2e7d32; font-weight:600; margin-top:15px; font-size:14px;">
+    <i class="fa-solid fa-circle-check"></i> এডমিনের কাছে সফলভাবে অর্ডারটি পাঠানো হয়েছে!
+  </div>
+
+  <div class="extra-actions">
+    <!-- WhatsApp Chat Link (Provide your WhatsApp number below) -->
+    <a href="https://wa.me/8801761885220?text=Hello!%20I%20have%20a%20question%20about%20my%20order." target="_blank" class="btn-whatsapp">
+      <i class="fa-brands fa-whatsapp" style="font-size: 17px; color: #25d366;"></i> অর্ডার নিয়ে কোনো প্রশ্ন থাকলে মেসেজ করুন
+    </a>
+
+    <a href="/" class="btn-return">
+      <i class="fa-solid fa-house"></i> Shop এ ফিরে যান
+    </a>
+  </div>
+</div>
+
+<div class="protected-footer">
+  <i class="fa-solid fa-shield-halved" style="color: #a285d8;"></i> Website is Protected by AminSir7
 </div>
 
 <script>
-  function startSendingProcess() {
-    const btn = document.getElementById('sendAdminBtn');
-    if (!btn) return;
+function startSendingProcess() {
+  const btn = document.getElementById('sendAdminBtn');
+  const animBox = document.getElementById('animBox');
+  const progressBar = document.getElementById('progressBar');
+  const progressText = document.getElementById('progressText');
+  const sentMsg = document.getElementById('sentMsg');
 
-    btn.innerText = "পাঠানো হচ্ছে...";
-    btn.disabled = true;
-    if (btn.classList) btn.classList.add('sending-loader');
+  if (!btn) return;
 
-    // ১. LocalStorage থেকে সম্পূর্ণ অর্ডারের তথ্য নেওয়া
-    let pendingOrder = null;
-    try {
-      const rawData = localStorage.getItem('pendingOrderData');
-      if (rawData) pendingOrder = JSON.parse(rawData);
-    } catch (e) {}
+  btn.disabled = true;
+  btn.style.display = 'none';
+  animBox.style.display = 'block';
 
-    // ২. Zinipay URL Parameters থেকে ব্যাকআপ ডাটা নেওয়া
-    const urlParams = new URLSearchParams(window.location.search);
-    const cusName = urlParams.get('cus_name') || (pendingOrder && pendingOrder.customer ? pendingOrder.customer.name : '');
-    const paidAmount = urlParams.get('amount') || (pendingOrder ? pendingOrder.payAmount : '');
-    const trxId = urlParams.get('transaction_id') || '';
+  // 0% to 100% Loading Animation Sequence
+  let currentProgress = 0;
+  const progressInterval = setInterval(() => {
+    currentProgress += Math.floor(Math.random() * 8) + 4;
+    if (currentProgress >= 90) {
+      currentProgress = 90; // Pause briefly at 90% until backend fetch resolves
+      clearInterval(progressInterval);
+    }
+    progressBar.style.width = currentProgress + '%';
+    progressText.innerText = currentProgress + '%';
+  }, 100);
 
-    // কাস্টমার অবজেক্ট তৈরি
-    const customerData = (pendingOrder && pendingOrder.customer) ? pendingOrder.customer : {
-      name: cusName || "Customer",
-      mobile: urlParams.get('cus_phone') || "N/A",
-      district: urlParams.get('district') || "N/A",
-      address: urlParams.get('address') || "N/A"
-    };
+  // ১. LocalStorage থেকে ব্যাকআপ ডাটা নেওয়া
+  let pendingOrder = null;
+  try {
+    const rawData = localStorage.getItem('pendingOrderData');
+    if (rawData) pendingOrder = JSON.parse(rawData);
+  } catch (e) {}
 
-    const payloadData = {
-      action: "SEND_TELEGRAM",
-      customer: customerData,
-      cartItems: pendingOrder ? pendingOrder.cartItems : [],
-      productTotal: pendingOrder ? pendingOrder.productTotal : 0,
-      deliveryCharge: pendingOrder ? pendingOrder.deliveryCharge : 0,
-      totalAmount: pendingOrder ? pendingOrder.totalAmount : paidAmount,
-      payAmount: paidAmount || (pendingOrder ? pendingOrder.payAmount : 0),
-      trxId: trxId
-    };
+  // ২. Zinipay URL Parameters থেকে ব্যাকআপ ডাটা নেওয়া
+  const urlParams = new URLSearchParams(window.location.search);
+  const cusName = urlParams.get('cus_name') || (pendingOrder && pendingOrder.customer ? pendingOrder.customer.name : '');
+  const paidAmount = urlParams.get('amount') || (pendingOrder ? pendingOrder.payAmount : '');
+  const trxId = urlParams.get('transaction_id') || '';
 
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbzx2vTmjA76dHDS2EDaeafutCcs0JWx1DILf4uvzbjVM4-tlKm5jJA27Wylno9OmJeorA/exec";
+  const customerData = (pendingOrder && pendingOrder.customer) ? pendingOrder.customer : {
+    name: cusName || "Customer",
+    mobile: urlParams.get('cus_phone') || "N/A",
+    district: urlParams.get('district') || "N/A",
+    address: urlParams.get('address') || "N/A"
+  };
 
-    fetch(scriptUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8"
-      },
-      body: JSON.stringify(payloadData)
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (btn.classList) btn.classList.remove('sending-loader');
-      btn.innerText = "✓ এডমিনের কাছে সফলভাবে পাঠানো হয়েছে";
-      btn.style.backgroundColor = "#28a745";
-    })
-    .catch(err => {
-      console.error(err);
-      if (btn.classList) btn.classList.remove('sending-loader');
-      alert("পাঠাতে সমস্যা হয়েছে, আবার চেষ্টা করুন।");
-      btn.innerText = "আপনার অর্ডারটি এডমিনের কাছে পাঠান";
-      btn.disabled = false;
-    });
+  const payloadData = {
+    action: "SEND_TELEGRAM",
+    customer: customerData,
+    cartItems: pendingOrder ? pendingOrder.cartItems : [],
+    productTotal: pendingOrder ? pendingOrder.productTotal : 0,
+    deliveryCharge: pendingOrder ? pendingOrder.deliveryCharge : 0,
+    totalAmount: pendingOrder ? pendingOrder.totalAmount : paidAmount,
+    payAmount: paidAmount || (pendingOrder ? pendingOrder.payAmount : 0),
+    trxId: trxId
+  };
+
+  const scriptUrl = "https://script.google.com/macros/s/AKfycbzx2vTmjA76dHDS2EDaeafutCcs0JWx1DILf4uvzbjVM4-t1Km5jJA27Wylno90mJeorA/exec";
+
+  fetch(scriptUrl, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payloadData)
+  })
+  .then(res => res.json())
+  .then(data => {
+    // Complete 100% Progress
+    progressBar.style.width = '100%';
+    progressText.innerText = '100%';
+
+    setTimeout(() => {
+      animBox.style.display = 'none';
+      sentMsg.style.display = 'block';
+
+      // "شكرًا" Particle Flower Burst Trigger
+      triggerShukranBurst();
+    }, 400);
+  })
+  .catch(err => {
+    console.error(err);
+    alert("পাঠাতে সমস্যা হয়েছে, আবার চেষ্টা করুন");
+    animBox.style.display = 'none';
+    btn.style.display = 'flex';
+    btn.disabled = false;
+  });
+}
+
+// "شكرًا" Word & Floral Burst Function
+function triggerShukranBurst() {
+  const card = document.getElementById('mainCard');
+  const colors = ['#28a745', '#20c997', '#8a64d6', '#6c47b5', '#a285d8', '#1e7e34'];
+  const totalParticles = 30;
+
+  for (let i = 0; i < totalParticles; i++) {
+    const el = document.createElement('div');
+    el.className = 'particle';
+    el.innerText = 'شكرًا';
+    
+    // Pick dynamic theme/green colors
+    el.style.color = colors[Math.floor(Math.random() * colors.length)];
+    el.style.fontSize = (Math.random() * 14 + 16) + 'px';
+
+    // Random trajectories in 360 degrees
+    const angle = Math.random() * Math.PI * 2;
+    const distance = Math.random() * 180 + 70;
+    const dx = Math.cos(angle) * distance + 'px';
+    const dy = Math.sin(angle) * distance + 'px';
+    const rot = (Math.random() * 360 - 180) + 'deg';
+
+    el.style.setProperty('--dx', dx);
+    el.style.setProperty('--dy', dy);
+    el.style.setProperty('--rot', rot);
+
+    // Center spawning
+    el.style.left = '50%';
+    el.style.top = '50%';
+
+    card.appendChild(el);
+
+    setTimeout(() => el.remove(), 1800);
   }
+}
 </script>
-
 </body>
 </html>
