@@ -348,37 +348,46 @@
     });
 
     let selectedProduct = null;
-    let selectedDeliveryCharge = 0;
+let selectedDeliveryCharge = 0;
+let selectedQuantity = 1; // <--- এই নতুন লাইনটি যোগ করুন
+
+function updateQty(change) {
+  if (!selectedProduct) return;
+  selectedQuantity += change;
+  if (selectedQuantity < 1) selectedQuantity = 1;
+  document.getElementById('product-qty').value = selectedQuantity;
+  updateSummary();
+}
 
     // প্রোডাক্ট ডিসপ্লে করার ফাংশন
-    function renderProducts(products) {
-        const container = document.getElementById('product-container');
-        container.innerHTML = '';
-        products.forEach(p => {
-            const card = document.createElement('div');
-            card.className = "glass-card glass-card-hover rounded-2xl p-5 text-center flex flex-col justify-between";
-            card.innerHTML = `
-                <div>
-                    <img src="${p.image}" class="w-full h-48 object-cover rounded-xl mb-4 shadow-sm" alt="${p.name}">
-                    <h4 class="font-bold text-lg text-brand-dark mb-1">${p.name}</h4>
-                    <p class="text-brand-700 font-extrabold text-xl mb-4">৳ ${p.price}</p>
-                </div>
-                <button onclick="selectProduct(${p.id})" class="w-full bg-brand-700 hover:bg-brand-800 text-white font-semibold py-2.5 rounded-xl transition shadow">
-                    Order করুন
-                </button>
-            `;
-            container.appendChild(card);
-        });
-    }
+function renderProducts(products) {
+  const container = document.getElementById('product-container');
+  container.innerHTML = '';
+  products.forEach(p => {
+    const card = document.createElement('div');
+    card.className = "glass-card glass-card-hover rounded-2xl p-5 text-center flex flex-col justify-between";
+    card.innerHTML = `
+      <div>
+        <img src="${p.image}" class="w-full h-48 object-cover rounded-xl mb-4 shadow-sm" alt="${p.name}">
+        <h4 class="font-bold text-lg text-brand-dark mb-1">${p.name}</h4>
+        <p class="text-brand-700 font-extrabold text-xl mb-4">৳ ${p.price}</p>
+      </div>
+      <button onclick="selectProduct(${p.id})" class="w-full bg-brand-700 hover:bg-brand-800 text-white font-semibold py-2.5 rounded-xl transition shadow-md">
+        Order করুন
+      </button>
+    `;
+    container.appendChild(card);
+  });
+}
 
-    // প্রোডাক্ট সিলেক্ট করা
-    function selectProduct(id) {
-        selectedProduct = sampleProducts.find(p => p.id === id);
-        document.getElementById('checkout-section').classList.remove('hidden');
-        document.getElementById('checkout-section').scrollIntoView({ behavior: 'smooth' });
-        updateSummary();
-    }
-
+// প্রোডাক্ট সিলেক্ট করা
+function selectProduct(id) {
+  selectedProduct = sampleProducts.find(p => p.id === id);
+  selectedQuantity = 1; // প্রোডাক্ট সিলেক্ট করলে রিটেট হয়ে ১ হয়ে যাবে
+  document.getElementById('checkout-section').classList.remove('hidden');
+  document.getElementById('checkout-section').scrollIntoView({ behavior: 'smooth' });
+  updateSummary();
+}
     // জেলা পরিবর্তনের সাথে ডেলিভারি চার্জ আপডেট
     districtSelect.addEventListener('change', function() {
         const val = this.value;
@@ -393,21 +402,28 @@
     });
 
     // সামারি আপডেট
-    function updateSummary() {
-        if (!selectedProduct) return;
-        const pPrice = selectedProduct.price;
-        const total = pPrice + selectedDeliveryCharge;
+function updateSummary() {
+  if (!selectedProduct) return;
+  const pPrice = selectedProduct.price * selectedQuantity;
+  const total = pPrice + selectedDeliveryCharge;
 
-        document.getElementById('selected-product-info').innerHTML = `
-            <div class="font-semibold text-brand-dark">${selectedProduct.name}</div>
-            <div class="text-xs text-gray-500">পরিমাণ: ১ টি</div>
-        `;
-        document.getElementById('summary-product-price').textContent = `৳ ${pPrice}`;
-        document.getElementById('summary-delivery-charge').textContent = `৳ ${selectedDeliveryCharge}`;
-        document.getElementById('summary-total-price').textContent = `৳ ${total}`;
-        document.getElementById('btnTotalPrice').textContent = `৳ ${total}`;
-    }
-
+  document.getElementById('selected-product-info').innerHTML = `
+    <div class="font-semibold text-brand-dark mb-2">${selectedProduct.name}</div>
+    <div class="flex items-center justify-between bg-white/60 p-2 rounded-xl border border-brand-200">
+      <span class="text-xs text-gray-600 font-medium">পরিমাণ:</span>
+      <div class="flex items-center gap-3">
+        <button type="button" onclick="updateQty(-1)" class="w-7 h-7 flex items-center justify-center bg-brand-100 hover:bg-brand-200 text-brand-800 font-bold rounded-lg transition">-</button>
+        <input type="number" id="product-qty" value="${selectedQuantity}" readonly class="w-10 text-center font-bold text-brand-900 bg-transparent border-none focus:outline-none">
+        <button type="button" onclick="updateQty(1)" class="w-7 h-7 flex items-center justify-center bg-brand-100 hover:bg-brand-200 text-brand-800 font-bold rounded-lg transition">+</button>
+      </div>
+    </div>
+  `;
+  
+  document.getElementById('summary-product-price').textContent = `৳ ${pPrice}`;
+  document.getElementById('summary-delivery-charge').textContent = `৳ ${selectedDeliveryCharge}`;
+  document.getElementById('summary-total-price').textContent = `৳ ${total}`;
+  document.getElementById('btnTotalPrice').textContent = `৳ ${total}`;
+}
     // অর্ডার সাবমিট এবং ZiniPay পেমেন্ট পেজে রিডাইরেক্ট
 document.getElementById('orderForm').addEventListener('submit', async function(e) {
   e.preventDefault();
@@ -416,36 +432,38 @@ document.getElementById('orderForm').addEventListener('submit', async function(e
   submitBtn.disabled = true;
   submitBtn.textContent = 'পেমেন্ট পেজে নেওয়া হচ্ছে...';
 
-  const orderData = {
-    product: selectedProduct ? selectedProduct.name : "",
-    price: selectedProduct ? selectedProduct.price : 0,
-    deliveryCharge: selectedDeliveryCharge,
-    total: (selectedProduct ? selectedProduct.price : 0) + selectedDeliveryCharge,
-    paymentOption: "ADVANCE_DELIVERY",
-    customer: {
-      name: document.getElementById('fullName').value,
-      mobile: document.getElementById('mobileNumber').value,
-      district: document.getElementById('districtSelect').value,
-      address: document.getElementById('fullAddress').value
-    },
-    redirect_url: 'https://aminsir7.github.io/mehndi-by-fariha/redirect.html',
-    cancel_url: 'https://aminsir7.github.io/mehndi-by-fariha/cancel.html'
-  };
-  
-  // ZiniPay-তে যাওয়ার ঠিক আগে LocalStorage-এ সব তথ্য সেভ করা
-  const pendingOrderData = {
-    customer: {
-      name: document.getElementById('fullName').value,
-      mobile: document.getElementById('mobileNumber').value,
-      district: document.getElementById('districtSelect').value,
-      address: document.getElementById('fullAddress').value
-    },
-    cartItems: selectedProduct ? [{ name: selectedProduct.name, price: selectedProduct.price, qty: 1 }] : [],
-    productTotal: selectedProduct ? selectedProduct.price : 0,
-    deliveryCharge: selectedDeliveryCharge || 0,
-    totalAmount: orderData.total,
-    payAmount: orderData.total
-  };
+  const pPrice = selectedProduct ? selectedProduct.price * selectedQuantity : 0;
+
+    const orderData = {
+      product: selectedProduct ? `${selectedProduct.name} (x${selectedQuantity})` : "",
+      price: pPrice,
+      deliveryCharge: selectedDeliveryCharge,
+      total: pPrice + selectedDeliveryCharge,
+      paymentOption: "ADVANCE_DELIVERY",
+      customer: {
+        name: document.getElementById('fullName').value,
+        mobile: document.getElementById('mobileNumber').value,
+        district: document.getElementById('districtSelect').value,
+        address: document.getElementById('fullAddress').value
+      },
+      redirect_url: 'https://aminsir7.github.io/mehndi-by-fariha/redirect.html',
+      cancel_url: 'https://aminsir7.github.io/mehndi-by-fariha/cancel.html'
+    };
+
+    // ZiniPay-তে যাওয়ার ঠিক আগে LocalStorage-এ সব তথ্য সেন্ড করা
+    const pendingOrderData = {
+      customer: {
+        name: document.getElementById('fullName').value,
+        mobile: document.getElementById('mobileNumber').value,
+        district: document.getElementById('districtSelect').value,
+        address: document.getElementById('fullAddress').value
+      },
+      cartItems: selectedProduct ? [{ name: selectedProduct.name, price: selectedProduct.price, qty: selectedQuantity }] : [],
+      productTotal: pPrice,
+      deliveryCharge: selectedDeliveryCharge || 0,
+      totalAmount: orderData.total,
+      payAmount: orderData.total
+    };
 
   localStorage.setItem('pendingOrderData', JSON.stringify(pendingOrderData));
 
