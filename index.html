@@ -410,7 +410,7 @@ function updateSummary() {
   document.getElementById('selected-product-info').innerHTML = `
     <div class="font-semibold text-brand-dark mb-2">${selectedProduct.name}</div>
     <div class="flex items-center justify-between bg-white/60 p-2 rounded-xl border border-brand-200">
-      <span class="text-xs text-gray-600 font-medium">পরিমাণ:</span>
+      <span class="text-xs text-gray-600 font-medium">কয়টি কোন নিবেন?:</span>
       <div class="flex items-center gap-3">
         <button type="button" onclick="updateQty(-1)" class="w-7 h-7 flex items-center justify-center bg-brand-100 hover:bg-brand-200 text-brand-800 font-bold rounded-lg transition">-</button>
         <input type="number" id="product-qty" value="${selectedQuantity}" readonly class="w-10 text-center font-bold text-brand-900 bg-transparent border-none focus:outline-none">
