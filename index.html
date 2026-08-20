@@ -537,22 +537,22 @@ document.getElementById('orderForm').addEventListener('submit', async function(e
     const finalTotalCalculated = Math.max(0, (pPrice + selectedDeliveryCharge) - discountAmount);
 
     const orderData = {
-      product: selectedProduct ? `${selectedProduct.name} (x${selectedQuantity})` : "",
-      price: pPrice,
-      deliveryCharge: selectedDeliveryCharge,
-      couponCode: appliedCoupon ? appliedCoupon.code : "None",
-      discount: discountAmount,
-      total: finalTotalCalculated,
-      paymentOption: "ADVANCE_DELIVERY",
-      customer: {
-        name: document.getElementById('fullName').value,
-        mobile: document.getElementById('mobileNumber').value,
-        district: document.getElementById('districtSelect').value,
-        address: document.getElementById('fullAddress').value
-      },
-      success_url: 'https://aminsir7.github.io/mehndi-by-fariha/redirect.html',
-      cancel_url: 'https://aminsir7.github.io/mehndi-by-fariha/cancel.html'
-    };
+  product: selectedProduct ? `${selectedProduct.name} (x${selectedQuantity})` : "",
+  price: pPrice,
+  deliveryCharge: selectedDeliveryCharge,
+  couponCode: appliedCoupon ? appliedCoupon.code : "None",  // কুপন কোড ঠিকভাবে যাওয়ার জন্য
+  discount: discountAmount,
+  total: finalTotalCalculated,
+  paymentOption: "ADVANCE_DELIVERY",
+  customer: {
+    name: document.getElementById('fullName').value,
+    mobile: document.getElementById('mobileNumber').value,
+    district: document.getElementById('districtSelect').value,
+    address: document.getElementById('fullAddress').value
+  },
+  success_url: 'https://aminsir7.github.io/mehndi-by-fariha/redirect.html',
+  cancel_url: 'https://aminsir7.github.io/mehndi-by-fariha/cancel.html'
+};
 
     // ZiniPay-তে যাওয়ার ঠিক আগে LocalStorage-এ সব তথ্য সেন্ড করা
     const pendingOrderData = {
