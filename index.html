@@ -142,12 +142,42 @@
 </head>
 <body class="text-gray-800 antialiased pb-16">
 
-    <!-- Global WhatsApp Button -->
-    <a href="https://wa.me/8801761885220?text=%E0%A6%86%E0%A6%AE%E0%A6%BF%20Mehndi%20By%20Fariha%20%E0%A6%93%E0%A6%AF%E0%A6%BC%E0%A7%87%E0%A6%AC%E0%A6%B8%E0%A6%BE%E0%A6%87%E0%A6%9F%20%E0%A6%A5%E0%A7%87%E0%A6%95%E0%A7%87%20%E0%A6%AF%E0%A7%8B%E0%A6%97%E0%A6%BE%E0%A6%AF%E0%A7%8B%E0%A6%97%20%E0%A6%95%E0%A6%B0%E0%A6%9B%E0%A6%BF" 
+    <!-- Custom Animation CSS -->
+<style>
+  @keyframes moveLeftRight {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(-8px); }
+  }
+  .animate-bounce-horizontal {
+    animation: moveLeftRight 1.5s infinite ease-in-out;
+  }
+</style>
+
+<!-- Floating Buttons Container -->
+<div class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4">
+  
+  <!-- Facebook Button with Animated Text -->
+  <div class="flex items-center gap-2">
+    <!-- Moving Text Badge -->
+    <span class="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg animate-bounce-horizontal whitespace-nowrap">
+      Follow করুন 👉
+    </span>
+    <!-- Facebook Circular Button -->
+    <a href="https://www.facebook.com/profile.php?id=61587323080573" 
        target="_blank" 
-       class="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-110">
-        <i class="fab fa-whatsapp text-3xl"></i>
+       class="bg-blue-600 hover:bg-blue-700 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-110">
+      <i class="fab fa-facebook-f text-2xl"></i>
     </a>
+  </div>
+
+  <!-- WhatsApp Button -->
+  <a href="https://wa.me/8801761885220?text=আমি Mehndi By Fariha এর Website থেকে মেসেজ করছি" 
+     target="_blank" 
+     class="bg-green-500 hover:bg-green-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 hover:scale-110">
+    <i class="fab fa-whatsapp text-3xl"></i>
+  </a>
+
+</div>
 
     <!-- Navbar -->
     <nav class="sticky top-0 z-40 glass-nav shadow-sm">
