@@ -288,6 +288,11 @@
                             <span>ডেলিভারি চার্জ:</span>
                             <span id="summary-delivery-charge">৳ ০</span>
                         </div>
+<div id="summary-discount-row" class="flex justify-between text-green-600 hidden">
+  <span>ডিসকাউন্ট (<span id="applied-coupon-name"></span>):</span>
+  <span>-৳ <span id="summary-discount">0</span></span>
+</div>
+
                         <div class="flex justify-between font-bold text-base text-brand-900 border-t pt-2">
                             <span>মোট সর্বমোট:</span>
                             <span id="summary-total-price">৳ ০</span>
@@ -318,7 +323,15 @@
                         <label class="block text-sm font-semibold text-gray-700 mb-1">৪. আপনার বিস্তারিত ঠিকানা *</label>
                         <textarea id="fullAddress" required rows="2" placeholder="বাসা নম্বর, রোড নম্বর, এলাকা, থানা..." class="w-full px-4 py-3 rounded-xl glass-input"></textarea>
                     </div>
-
+<!-- Coupon Input Field -->
+<div>
+  <label class="block text-sm font-semibold text-gray-700 mb-1">৫. ডিসকাউন্ট কুপন (যদি থাকে)</label>
+  <div class="flex gap-2">
+    <input type="text" id="couponCode" placeholder="কুপন কোড লিখুন" class="w-full px-4 py-2.5 rounded-xl glass-input uppercase">
+    <button type="button" onclick="applyCoupon()" class="bg-brand-700 hover:bg-brand-800 text-white font-bold px-4 py-2.5 rounded-xl transition flex-shrink-0">Apply</button>
+  </div>
+  <p id="couponMsg" class="text-xs mt-1 font-medium hidden"></p>
+</div>
                     <div class="p-3 bg-brand-50 rounded-xl border border-brand-200 text-sm text-brand-800 font-medium">
   💳 <strong>পেমেন্ট পদ্ধতি:</strong> ডেলিভারি চার্জ অগ্রিম পেমেন্ট করে অর্ডার কনফার্ম করুন।
 </div>
@@ -380,6 +393,15 @@
     let selectedProduct = null;
 let selectedDeliveryCharge = 0;
 let selectedQuantity = 1; // <--- এই নতুন লাইনটি যোগ করুন
+let appliedCoupon = null;
+let discountAmount = 0;
+
+// কুপন কোডের লিস্ট (এখান থেকে যেকোনো সময় কুপন এড/এডিট/ডিলিট করতে পারবেন)
+const COUPONS = {
+  "MBF10":  { type: "percent", value: 10 },     // ১০% শতাংশ ছাড়
+  "RATUL10":  { type: "percent", value: 10 },     // ১০% শতাংশ ছাড়
+  "SAFU10":  { type: "percent", value: 10 }     // ১০% শতাংশ ছাড়
+};
 
 function updateQty(change) {
   if (!selectedProduct) return;
@@ -433,26 +455,74 @@ function selectProduct(id) {
 
     // সামারি আপডেট
 function updateSummary() {
-  if (!selectedProduct) return;
-  const pPrice = selectedProduct.price * selectedQuantity;
-  const total = pPrice + selectedDeliveryCharge;
+    if (!selectedProduct) return;
+    const pPrice = selectedProduct.price * selectedQuantity;
+    const subtotal = pPrice + selectedDeliveryCharge;
 
-  document.getElementById('selected-product-info').innerHTML = `
-    <div class="font-semibold text-brand-dark mb-2">${selectedProduct.name}</div>
-    <div class="flex items-center justify-between bg-white/60 p-2 rounded-xl border border-brand-200">
-      <span class="text-xs text-gray-600 font-medium">কয়টি কোন নিবেন?:</span>
-      <div class="flex items-center gap-3">
-        <button type="button" onclick="updateQty(-1)" class="w-7 h-7 flex items-center justify-center bg-brand-100 hover:bg-brand-200 text-brand-800 font-bold rounded-lg transition">-</button>
-        <input type="number" id="product-qty" value="${selectedQuantity}" readonly class="w-10 text-center font-bold text-brand-900 bg-transparent border-none focus:outline-none">
-        <button type="button" onclick="updateQty(1)" class="w-7 h-7 flex items-center justify-center bg-brand-100 hover:bg-brand-200 text-brand-800 font-bold rounded-lg transition">+</button>
+    // কুপন হিসাব
+    discountAmount = 0;
+    if (appliedCoupon) {
+      if (appliedCoupon.type === 'flat') {
+        discountAmount = appliedCoupon.value;
+      } else if (appliedCoupon.type === 'percent') {
+        discountAmount = Math.round((pPrice * appliedCoupon.value) / 100);
+      }
+    }
+
+    const finalTotal = Math.max(0, subtotal - discountAmount);
+
+    document.getElementById('selected-product-info').innerHTML = `
+      <div class="font-semibold text-brand-dark mb-2">${selectedProduct.name}</div>
+      <div class="flex items-center justify-between bg-white/60 p-2 rounded-xl border border-brand-200">
+        <span class="text-xs text-gray-600 font-medium">কয়টি কোন নিবেন?:</span>
+        <div class="flex items-center gap-3">
+          <button type="button" onclick="updateQty(-1)" class="w-7 h-7 flex items-center justify-center bg-brand-100 hover:bg-brand-200 text-brand-800 rounded-lg font-bold text-sm">-</button>
+          <input type="number" id="product-qty" value="${selectedQuantity}" readonly class="w-10 text-center font-bold text-brand-900 bg-transparent border-none">
+          <button type="button" onclick="updateQty(1)" class="w-7 h-7 flex items-center justify-center bg-brand-100 hover:bg-brand-200 text-brand-800 rounded-lg font-bold text-sm">+</button>
+        </div>
       </div>
-    </div>
-  `;
-  
-  document.getElementById('summary-product-price').textContent = `৳ ${pPrice}`;
-  document.getElementById('summary-delivery-charge').textContent = `৳ ${selectedDeliveryCharge}`;
-  document.getElementById('summary-total-price').textContent = `৳ ${total}`;
-  document.getElementById('btnTotalPrice').textContent = `৳ ${total}`;
+    `;
+
+    document.getElementById('summary-product-price').textContent = `৳ ${pPrice}`;
+    document.getElementById('summary-delivery-charge').textContent = `৳ ${selectedDeliveryCharge}`;
+
+    // ডিসকাউন্ট ডিসপ্লে
+    const discountRow = document.getElementById('summary-discount-row');
+    if (discountAmount > 0) {
+      discountRow.classList.remove('hidden');
+      document.getElementById('applied-coupon-name').textContent = appliedCoupon.code;
+      document.getElementById('summary-discount').textContent = discountAmount;
+    } else {
+      discountRow.classList.add('hidden');
+    }
+
+    document.getElementById('summary-total-price').textContent = `৳ ${finalTotal}`;
+    document.getElementById('btnTotalPrice').textContent = `৳ ${finalTotal}`;
+}
+
+// কুপন অ্যাপ্লাই করার ফাংশন
+function applyCoupon() {
+  const codeInput = document.getElementById('couponCode').value.trim().toUpperCase();
+  const msgEl = document.getElementById('couponMsg');
+
+  if (!codeInput) {
+    msgEl.textContent = 'দয়া করে একটি কুপন কোড লিখুন।';
+    msgEl.className = 'text-xs mt-1 font-medium text-red-500';
+    msgEl.classList.remove('hidden');
+    return;
+  }
+
+  if (COUPONS[codeInput]) {
+    appliedCoupon = { ...COUPONS[codeInput], code: codeInput };
+    msgEl.textContent = 'কুপন সফলভাবে যুক্ত হয়েছে!';
+    msgEl.className = 'text-xs mt-1 font-medium text-green-600';
+    msgEl.classList.remove('hidden');
+    updateSummary();
+  } else {
+    msgEl.textContent = 'ভুল বা ইনভ্যালিড কুপন কোড!';
+    msgEl.className = 'text-xs mt-1 font-medium text-red-500';
+    msgEl.classList.remove('hidden');
+  }
 }
     // অর্ডার সাবমিট এবং DeshiPay পেমেন্ট পেজে রিডাইরেক্ট
 document.getElementById('orderForm').addEventListener('submit', async function(e) {
@@ -464,11 +534,15 @@ document.getElementById('orderForm').addEventListener('submit', async function(e
 
   const pPrice = selectedProduct ? selectedProduct.price * selectedQuantity : 0;
 
+    const finalTotalCalculated = Math.max(0, (pPrice + selectedDeliveryCharge) - discountAmount);
+
     const orderData = {
       product: selectedProduct ? `${selectedProduct.name} (x${selectedQuantity})` : "",
       price: pPrice,
       deliveryCharge: selectedDeliveryCharge,
-      total: pPrice + selectedDeliveryCharge,
+      couponCode: appliedCoupon ? appliedCoupon.code : "None",
+      discount: discountAmount,
+      total: finalTotalCalculated,
       paymentOption: "ADVANCE_DELIVERY",
       customer: {
         name: document.getElementById('fullName').value,
