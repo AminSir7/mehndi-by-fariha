@@ -424,7 +424,7 @@ function updateSummary() {
   document.getElementById('summary-total-price').textContent = `৳ ${total}`;
   document.getElementById('btnTotalPrice').textContent = `৳ ${total}`;
 }
-    // অর্ডার সাবমিট এবং ZiniPay পেমেন্ট পেজে রিডাইরেক্ট
+    // অর্ডার সাবমিট এবং DeshiPay পেমেন্ট পেজে রিডাইরেক্ট
 document.getElementById('orderForm').addEventListener('submit', async function(e) {
   e.preventDefault();
 
@@ -446,7 +446,7 @@ document.getElementById('orderForm').addEventListener('submit', async function(e
         district: document.getElementById('districtSelect').value,
         address: document.getElementById('fullAddress').value
       },
-      redirect_url: 'https://aminsir7.github.io/mehndi-by-fariha/redirect.html',
+      success_url: 'https://aminsir7.github.io/mehndi-by-fariha/redirect.html',
       cancel_url: 'https://aminsir7.github.io/mehndi-by-fariha/cancel.html'
     };
 
@@ -469,10 +469,13 @@ document.getElementById('orderForm').addEventListener('submit', async function(e
 
   try {
     const payload = {
-      ...orderData,
-      payAmount: selectedDeliveryCharge,
-      action: "CREATE_PAYMENT"
-    };
+  ...orderData,
+  amount: selectedDeliveryCharge, // অথবা পুরো পেমেন্ট নিতে চাইলে orderData.total
+  cus_name: orderData.customer.name,
+  cus_phone: orderData.customer.mobile,
+  cus_email: "customer@gmail.com", // কাস্টমার ইমেইল ফিল্ড না থাকলে ডিফল্ট দিতে পারেন
+  action: "CREATE_PAYMENT"
+};
 
     const res = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
@@ -490,9 +493,9 @@ document.getElementById('orderForm').addEventListener('submit', async function(e
     }
 
     if (result && (result.status === true || result.status === "success") && result.payment_url) {
-      localStorage.setItem('lastOrder', JSON.stringify(orderData));
-      window.location.href = result.payment_url;
-    } else {
+  localStorage.setItem('lastOrder', JSON.stringify(orderData));
+  window.location.href = result.payment_url;
+} else {
       alert('পেমেন্ট শুরু করতে সমস্যা হয়েছে: ' + (result.message || result.error || JSON.stringify(result)));
       submitBtn.disabled = false;
       submitBtn.textContent = 'অর্ডার কনফার্ম করুন';
