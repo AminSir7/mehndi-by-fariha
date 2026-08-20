@@ -492,9 +492,11 @@ document.getElementById('orderForm').addEventListener('submit', async function(e
       throw new Error("Invalid response format from server");
     }
 
-    if (result && (result.status === true || result.status === "success") && result.payment_url) {
+    const paymentUrl = result.payment_url || (result.data && result.data.payment_url);
+
+if (paymentUrl) {
   localStorage.setItem('lastOrder', JSON.stringify(orderData));
-  window.location.href = result.payment_url;
+  window.location.href = paymentUrl;
 } else {
       alert('পেমেন্ট শুরু করতে সমস্যা হয়েছে: ' + (result.message || result.error || JSON.stringify(result)));
       submitBtn.disabled = false;
