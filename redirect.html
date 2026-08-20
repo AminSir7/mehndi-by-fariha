@@ -353,7 +353,7 @@ function startSendingProcess() {
   const urlParams = new URLSearchParams(window.location.search);
   const cusName = urlParams.get('cus_name') || (pendingOrder && pendingOrder.customer ? pendingOrder.customer.name : '');
   const paidAmount = urlParams.get('amount') || (pendingOrder ? pendingOrder.payAmount : '');
-  const trxId = urlParams.get('transaction_id') || '';
+  const trxId = urlParams.get('transaction_id') || urlParams.get('transactionId') || urlParams.get('trxID') || urlParams.get('invoice_id') || '';
 
   const customerData = (pendingOrder && pendingOrder.customer) ? pendingOrder.customer : {
     name: cusName || "Customer",
