@@ -138,19 +138,24 @@
       opacity: 0.2;
     }
   }
-.css-typing-text {
-  display: inline-block;
-  white-space: nowrap;
+.ticker-wrapper {
+  display: flex;
   overflow: hidden;
-  border-right: 2px solid #6b21a8;
-  width: 0;
-  animation: typeText 3.5s steps(40, end) infinite;
 }
 
-@keyframes typeText {
-  0% { width: 0; }
-  60% { width: 100%; }
-  100% { width: 100%; }
+.ticker-text {
+  display: inline-block;
+  padding-left: 100%;
+  animation: marquee 12s linear infinite;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(-100%, 0);
+  }
 }
 </style>
 </head>
@@ -475,17 +480,19 @@ function removeFromCart(id) {
   updateSummary();
 }
     // জেলা পরিবর্তনের সাথে ডেলিভারি চার্জ আপডেট
-    districtSelect.addEventListener('change', function() {
-        const val = this.value;
-        if (val === "সুনামগঞ্জ") {
-            selectedDeliveryCharge = 60;
-        } else if (val === "ঢাকা" || val === "গাজীপুর" || val === "নারায়ণগঞ্জ") {
-            selectedDeliveryCharge = 110;
-        } else {
-            selectedDeliveryCharge = 120;
-        }
-        updateSummary();
-    });
+districtSelect.addEventListener('change', function() {
+  const val = this.value;
+  if (val === "সুনামগঞ্জ") {
+    selectedDeliveryCharge = 49;
+  } else if (val === "ঢাকা") {
+    selectedDeliveryCharge = 99;
+  } else if (val === "গাজীপুর" || val === "নারায়ণগঞ্জ") {
+    selectedDeliveryCharge = 110;
+  } else {
+    selectedDeliveryCharge = 120;
+  }
+  updateSummary();
+});
 
     function updateSummary() {
   const infoContainer = document.getElementById('selected-product-info');
@@ -525,10 +532,12 @@ function removeFromCart(id) {
 
   if (!districtVal) {
     itemsHtml += `
-      <div class="py-2 px-3 my-2 text-center bg-brand-50/80 rounded-lg border border-brand-200/60 shadow-sm overflow-hidden">
-        <p class="css-typing-text font-bold text-brand-700 text-xs inline-block">
-          সর্বমোট দাম জানতে, আপনার ঠিকানা পূরণ করুন
-        </p>
+      <div class="py-2.5 px-3 my-2 bg-brand-50/80 rounded-lg border border-brand-200/60 shadow-sm overflow-hidden flex items-center">
+        <div class="ticker-wrapper w-full overflow-hidden">
+          <div class="ticker-text font-bold text-brand-700 text-xs sm:text-sm whitespace-nowrap">
+            সর্বমোট দাম জানতে, আপনার ঠিকানা পূরণ করুন। সাথে অন্য সাইজের মেহেদি নিতে চাইলে উপরে Scroll করে Add To Cart করুন।
+          </div>
+        </div>
       </div>
     `;
   }
